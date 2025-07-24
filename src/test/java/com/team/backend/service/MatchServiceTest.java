@@ -46,37 +46,34 @@ class MatchServiceTest {
 
     @BeforeEach
     void setup() {
+        Hobby hobby = new Hobby();
+        hobby.setId(1L);
+
         user = User.of("user", "login", "pass", Sex.MALE, Preference.WOMEN,
-                "Description for user", 25, 20, 30);
+                "Description for user", 25, 20, 30, "Lublin", List.of(hobby));
         user.setId(1L);
-        user.setLocalization("Lublin");
 
         likingUser = User.of("liker", "likerLogin", "pass", Sex.MALE, Preference.WOMEN,
-                "Description for liker", 28, 22, 35);
+                "Description for liker", 28, 22, 35, "Lublin", List.of(hobby));
         likingUser.setId(1L);
 
         likedUser = User.of("liked", "likedLogin", "pass", Sex.FEMALE, Preference.MEN,
-                "Description for liked", 24, 20, 30);
+                "Description for liked", 24, 20, 30, "Lublin", List.of(hobby));
         likedUser.setId(2L);
 
         pendingPair = new PendingPair();
 
-        Hobby hobby = new Hobby();
-        hobby.setId(1L);
         user.setHobbies(List.of(hobby));
 
         candidate1 = User.of("c1", "c1login", "pass", Sex.FEMALE, Preference.MEN,
-                "Description for c1", 26, 22, 32);
+                "Description for c1", 26, 22, 32, "Lublin", List.of(hobby));
         candidate1.setId(2L);
-        candidate1.setLocalization("Lublin");
-        candidate1.setHobbies(List.of(hobby));
 
         candidate2 = User.of("c2", "c2login", "pass", Sex.FEMALE, Preference.MEN,
-                "Description for c2", 27, 21, 33);
+                "Description for c2", 27, 21, 33, "Lublin", List.of());
         candidate2.setId(3L);
-        candidate2.setLocalization("Lublin");
-        candidate2.setHobbies(List.of());
     }
+
 
 
     @Test

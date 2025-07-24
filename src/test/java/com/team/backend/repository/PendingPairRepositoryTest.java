@@ -3,6 +3,7 @@ package com.team.backend.repository;
 import com.team.backend.model.Enum.LikedStatus;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Enum.Sex;
+import com.team.backend.model.Hobby;
 import com.team.backend.model.PairStatus;
 import com.team.backend.model.PendingPair;
 import com.team.backend.model.User;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,9 +34,10 @@ class PendingPairRepositoryTest {
     @BeforeEach
     void setup() {
         user1 = User.of("user1", "login1", "pass", Sex.MALE, Preference.WOMEN,
-                "Hello, I'm user1", 25, 20, 30);
+                "Hello, I'm user1", 25, 20, 30, "Warsaw", List.of(Hobby.fromString("Reading")));
+
         user2 = User.of("user2", "login2", "pass", Sex.FEMALE, Preference.MEN,
-                "Hello, I'm user2", 23, 22, 35);
+                "Hello, I'm user2", 23, 22, 35, "Krakow", List.of(Hobby.fromString("Cooking")));
 
         entityManager.persist(user1);
         entityManager.persist(user2);

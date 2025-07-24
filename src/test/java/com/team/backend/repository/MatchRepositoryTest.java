@@ -2,6 +2,7 @@ package com.team.backend.repository;
 
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Enum.Sex;
+import com.team.backend.model.Hobby;
 import com.team.backend.model.Match;
 import com.team.backend.model.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,11 +33,14 @@ class MatchRepositoryTest {
     @BeforeEach
     void setup() {
         user1 = User.of("user1", "login1", "pass", Sex.MALE, Preference.WOMEN,
-                "Hello, I'm user1", 25, 20, 30);
+                "Hello, I'm user1", 25, 20, 30, "Warsaw", List.of(Hobby.fromString("Reading")));
+
         user2 = User.of("user2", "login2", "pass", Sex.FEMALE, Preference.MEN,
-                "Hello, I'm user2", 23, 22, 35);
+                "Hello, I'm user2", 23, 22, 35, "Krakow", List.of(Hobby.fromString("Cooking")));
+
         user3 = User.of("user3", "login3", "pass", Sex.FEMALE, Preference.WOMEN,
-                "Hello, I'm user3", 27, 25, 40);
+                "Hello, I'm user3", 27, 25, 40, "Gdansk", List.of(Hobby.fromString("Listening to Music")));
+
 
         entityManager.persist(user1);
         entityManager.persist(user2);

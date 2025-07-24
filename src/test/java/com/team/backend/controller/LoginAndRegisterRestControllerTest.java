@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.backend.config.security.JwtConfigProperties;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Enum.Sex;
+import com.team.backend.model.Hobby;
 import com.team.backend.model.dto.LoginRequest;
 import com.team.backend.model.dto.LoginResponseDto;
 import com.team.backend.model.dto.RegisterRequest;
@@ -20,6 +21,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -56,14 +59,14 @@ class LoginAndRegisterRestControllerTest {
     void shouldRegisterUserSuccessfully() throws Exception {
         // Given
         RegisterRequest registerRequest = new RegisterRequest("testUser", "testLogin", "password123", Sex.MALE, Preference.BOTH, "I am a test user", 25,
-                20, 30);
+                20, 30, "Warsaw", List.of(Hobby.fromString("Reading")));
         LoginRequest loginRequest = new LoginRequest("testUser", "testLogin", "encodedPassword123");
         LoginResponseDto loginResponseDto = new LoginResponseDto("testUser", "testLogin", "testPassword");
         RegisterResponseDto expectedResponse = new RegisterResponseDto("testUser", "testLogin", "REGISTERED");
 
         // When
         when(mapper.fromRegisterRequestDto(registerRequest)).thenReturn(loginRequest);
-        when(loginAndRegisterService.register(registerRequest)).thenReturn(expectedResponse);
+        when(loginAndRegisterService.register(any(RegisterRequest.class))).thenReturn(expectedResponse);
         when(mapper.fromRegisterRequestDto(registerRequest)).thenReturn(loginRequest);
         when(passwordEncoderService.encodePassword(any())).thenReturn("encodedPassword123");
 

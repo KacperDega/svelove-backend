@@ -3,6 +3,7 @@ package com.team.backend.service;
 import com.team.backend.model.Enum.LikedStatus;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Enum.Sex;
+import com.team.backend.model.Hobby;
 import com.team.backend.model.PairStatus;
 import com.team.backend.model.PendingPair;
 import com.team.backend.model.User;
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.*;
@@ -39,12 +41,12 @@ class PendingPairServiceTest {
 
     @BeforeEach
     void setup() {
-        user1 = User.of("username1", "login1", "password1", Sex.MALE, Preference.WOMEN,
-                "Description for user1", 25, 20, 30);
+        user1 = User.of("user1", "login1", "pass", Sex.MALE, Preference.WOMEN,
+                "Hello, I'm user1", 25, 20, 30, "Warsaw", List.of(Hobby.fromString("Reading")));
         user1.setId(1L);
 
-        user2 = User.of("username2", "login2", "password2", Sex.FEMALE, Preference.MEN,
-                "Description for user2", 23, 22, 35);
+        user2 = User.of("user2", "login2", "pass", Sex.FEMALE, Preference.MEN,
+                "Hello, I'm user2", 23, 22, 35, "Krakow", List.of(Hobby.fromString("Cooking")));
         user2.setId(2L);
 
     }
