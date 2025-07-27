@@ -1,5 +1,6 @@
 package com.team.backend.service;
 
+import com.team.backend.model.Enum.HobbyEnum;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Hobby;
 import com.team.backend.model.User;
@@ -72,7 +73,7 @@ class UserServiceTest {
                 "desc", "loc", 20, 30);
 
         Hobby hobby = new Hobby();
-        hobby.setName(com.team.backend.model.Enum.Hobby.SWIMMING);
+        hobby.setName(HobbyEnum.SWIMMING);
         hobby.setId(1L);
         List<Hobby> hobbies = List.of(hobby);
 

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum Hobby {
+public enum HobbyEnum {
     // Sztuka i kreatywność
     DRAWING("Drawing"),
     PAINTING("Painting"),
@@ -60,7 +60,7 @@ public enum Hobby {
 
     private final String displayName;
 
-    Hobby(String displayName) {
+    HobbyEnum(String displayName) {
         this.displayName = displayName;
     }
 
@@ -69,19 +69,19 @@ public enum Hobby {
         return displayName;
     }
 
-    private static final Map<String, Hobby> DISPLAY_NAME_MAP = new HashMap<>();
+    private static final Map<String, HobbyEnum> DISPLAY_NAME_MAP = new HashMap<>();
 
     static {
-        for (Hobby hobby : Hobby.values()) {
+        for (HobbyEnum hobby : HobbyEnum.values()) {
             DISPLAY_NAME_MAP.put(hobby.getDisplayName().toLowerCase(), hobby);
         }
     }
 
     @JsonCreator
-    public static Hobby fromDisplayName(String value) {
+    public static HobbyEnum fromDisplayName(String value) {
         if (value == null) return null;
 
-        Hobby hobby = DISPLAY_NAME_MAP.get(value.toLowerCase());
+        HobbyEnum hobby = DISPLAY_NAME_MAP.get(value.toLowerCase());
         if (hobby == null) {
             throw new IllegalArgumentException("nieznane hobby: " + value);
         }

@@ -1,5 +1,6 @@
 package com.team.backend.service;
 
+import com.team.backend.model.Enum.HobbyEnum;
 import com.team.backend.model.Hobby;
 import com.team.backend.repository.HobbyRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,11 +37,11 @@ class HobbyServiceTest {
     void setUp() {
         hobby1 = new Hobby();
         hobby1.setId(1L);
-        hobby1.setName(com.team.backend.model.Enum.Hobby.READING);
+        hobby1.setName(HobbyEnum.READING);
 
         hobby2 = new Hobby();
         hobby2.setId(2L);
-        hobby2.setName(com.team.backend.model.Enum.Hobby.SWIMMING);
+        hobby2.setName(HobbyEnum.SWIMMING);
     }
 
     @Test

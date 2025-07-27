@@ -1,7 +1,7 @@
 package com.team.backend.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.team.backend.model.Enum.Preference;
+import com.team.backend.model.Enum.HobbyEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
@@ -21,7 +21,7 @@ public class Hobby
     @NonNull
     @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false)
-    private com.team.backend.model.Enum.Hobby name;
+    private HobbyEnum name;
 
     public String getHobbyName() {
         return name.getDisplayName();
@@ -30,7 +30,7 @@ public class Hobby
     @JsonCreator
     public static Hobby fromString(String hobbyName) {
         Hobby hobby = new Hobby();
-        hobby.setName(com.team.backend.model.Enum.Hobby.fromDisplayName(hobbyName));
+        hobby.setName(HobbyEnum.fromDisplayName(hobbyName));
         return hobby;
     }
 

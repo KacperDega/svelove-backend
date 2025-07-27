@@ -1,6 +1,7 @@
 package com.team.backend.model.mapper;
 
 
+import com.team.backend.model.Enum.HobbyEnum;
 import com.team.backend.model.Hobby;
 import com.team.backend.model.User;
 import com.team.backend.model.dto.*;
@@ -22,7 +23,7 @@ public class UserMapper {
 
         List<Hobby> hobbies = userRequest.hobbies().stream()
                 .map(hobbyEntity -> {
-                    com.team.backend.model.Enum.Hobby enumHobby = hobbyEntity.getName();
+                    HobbyEnum enumHobby = hobbyEntity.getName();
                     List<Hobby> existing = hobbyRepository.findByName(enumHobby);
                     if (!existing.isEmpty()) {
                         return existing.get(0);
