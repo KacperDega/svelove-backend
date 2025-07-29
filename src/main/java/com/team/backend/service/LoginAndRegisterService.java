@@ -1,7 +1,6 @@
 package com.team.backend.service;
 
 import com.team.backend.model.User;
-import com.team.backend.model.dto.LoginRequest;
 import com.team.backend.model.dto.LoginResponseDto;
 import com.team.backend.model.dto.RegisterRequest;
 import com.team.backend.model.dto.RegisterResponseDto;
@@ -10,8 +9,6 @@ import com.team.backend.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Log4j2
@@ -21,12 +18,12 @@ public class LoginAndRegisterService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoderService passwordEncoderService;
+    private final EncoderService encoderService;
 
 
     public RegisterResponseDto register(RegisterRequest requestDto) {
         final User user = userMapper.mapToUser(requestDto);
-        String encodedPassword = passwordEncoderService.encodePassword(user.getPassword());
+        String encodedPassword = encoderService.encodePassword(user.getPassword());
         user.setPassword(encodedPassword);
         final User saved = userRepository.save(user);
         log.info("User registered: {}", saved);

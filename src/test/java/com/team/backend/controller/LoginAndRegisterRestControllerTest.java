@@ -12,7 +12,7 @@ import com.team.backend.model.dto.RegisterResponseDto;
 import com.team.backend.model.mapper.LoginAndRegisterMapper;
 import com.team.backend.model.mapper.UserMapper;
 import com.team.backend.service.LoginAndRegisterService;
-import com.team.backend.service.PasswordEncoderService;
+import com.team.backend.service.EncoderService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -46,7 +46,7 @@ class LoginAndRegisterRestControllerTest {
     private LoginAndRegisterMapper mapper;
 
     @MockitoBean
-    private PasswordEncoderService passwordEncoderService;
+    private EncoderService encoderService;
 
     @MockitoBean
     private JwtConfigProperties jwtConfigProperties;
@@ -68,7 +68,7 @@ class LoginAndRegisterRestControllerTest {
         when(mapper.fromRegisterRequestDto(registerRequest)).thenReturn(loginRequest);
         when(loginAndRegisterService.register(any(RegisterRequest.class))).thenReturn(expectedResponse);
         when(mapper.fromRegisterRequestDto(registerRequest)).thenReturn(loginRequest);
-        when(passwordEncoderService.encodePassword(any())).thenReturn("encodedPassword123");
+        when(encoderService.encodePassword(any())).thenReturn("encodedPassword123");
 
 
         // Then

@@ -22,7 +22,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoderService passwordEncoderService;
+    private final EncoderService encoderService;
     private final HobbyService hobbyService;
 
     public Optional<User> getUserById(Long id) {
@@ -83,11 +83,11 @@ public class UserService {
         User user = userRepository.findByLogin(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
-        if (!passwordEncoderService.matches(request.oldPassword(), user.getPassword())) {
+        if (!encoderService.matches(request.oldPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Old password is incorrect");
         }
 
-        user.setPassword(passwordEncoderService.encodePassword(request.newPassword()));
+        user.setPassword(encoderService.encodePassword(request.newPassword()));
         return userRepository.save(user);
     }
 }

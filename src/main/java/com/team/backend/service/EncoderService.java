@@ -5,11 +5,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class PasswordEncoderService {
+public class EncoderService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public PasswordEncoderService() {
+    public EncoderService() {
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
