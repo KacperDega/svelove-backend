@@ -37,7 +37,7 @@ public class SupabaseStorageClient {
         return String.format("%s/storage/v1/object/public/%s/%s", baseUrl, bucket, filePath);
     }
 
-    public void deleteFile(String bucket, String filePath) {
+    public void deleteFile(String filePath) {
         String deletePath = String.format("/storage/v1/object/%s/%s", bucket, filePath);
 
         supabaseWebClient.delete()

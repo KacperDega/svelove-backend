@@ -1,11 +1,20 @@
 package com.team.backend.service;
 
 import com.team.backend.client.SupabaseStorageClient;
+import com.team.backend.model.User;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SupabaseStorageService {
 
+    private final UserService userService;
     @Value("${supabase.bucket}")
     private String bucket;
 
@@ -25,23 +35,34 @@ public class SupabaseStorageService {
     private final EncoderService encoderService;
 
     public String uploadImage(MultipartFile file, Long userId) throws IOException {
-        validateFile(file);
-
         if (userId == null) {
             throw new IllegalArgumentException("Parameter userId cannot be null");
         }
 
-        String contentType = file.getContentType();
-        String extension = extractExtension(file.getOriginalFilename());
+        checkPhotoLimit(userId);
+        validateFile(file);
 
-        String uniqueFileName = UUID.randomUUID() + extension;
+        byte[] webpBytes = convertToWebPWithoutMetadata(file);
+        String uniqueFileName = UUID.randomUUID() + ".webp";
+
         String userHash = encoderService.encodeUserIdToFolderHash(userId);
         String filePath = String.format("%s/%s", userHash, uniqueFileName);
 
-        supabaseStorageClient.uploadFile(file.getBytes(), contentType, filePath);
+        supabaseStorageClient.uploadFile(webpBytes, "image/webp", filePath);
 
         return supabaseStorageClient.createPublicUrl(filePath);
     }
+
+
+    private void checkPhotoLimit(Long userId) {
+        User user = userService.getUserById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
+
+        if (user.getPhotoUrls().size() >= 5) {
+            throw new IllegalStateException("Max 5 photos per user allowed");
+        }
+    }
+
 
     private void validateFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
@@ -74,9 +95,37 @@ public class SupabaseStorageService {
         return List.of(".jpg", ".jpeg", ".png", ".webp").contains(extension.toLowerCase());
     }
 
+    private byte[] convertToWebPWithoutMetadata(MultipartFile file) throws IOException {
+        ImageIO.scanForPlugins();
+
+        BufferedImage image = ImageIO.read(file.getInputStream());
+
+        if (image == null) {
+            throw new IllegalArgumentException("Invalid image file");
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageWriter writer = ImageIO.getImageWritersByMIMEType("image/webp").next();
+
+        try (ImageOutputStream ios = ImageIO.createImageOutputStream(baos)) {
+            writer.setOutput(ios);
+
+            ImageWriteParam param = writer.getDefaultWriteParam();
+            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            param.setCompressionType(param.getCompressionTypes()[0]);
+            param.setCompressionQuality(1.0f);
+
+            writer.write(null, new IIOImage(image, null, null), param);
+            writer.dispose();
+        }
+
+        return baos.toByteArray();
+    }
+
+
     public void deleteImage(String publicUrl) {
         String filePath = supabaseStorageClient.extractFilePathFromPublicUrl(publicUrl);
 
-        supabaseStorageClient.deleteFile(bucket, filePath);
+        supabaseStorageClient.deleteFile(filePath);
     }
 }
