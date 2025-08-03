@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -75,6 +76,11 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<PairStatus> pairStatuses;
+
+    @ElementCollection
+    @OrderColumn(name = "photo_order")
+    @Column(name = "photo_url")
+    private List<String> photoUrls = new ArrayList<>();
 
 
     @Override

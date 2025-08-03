@@ -1,6 +1,7 @@
 package com.team.backend.controller;
 
 
+import com.team.backend.model.dto.ErrorResponse;
 import com.team.backend.model.dto.LoginResponseDto;
 import com.team.backend.model.dto.RegisterRequest;
 import com.team.backend.model.dto.RegisterResponseDto;
@@ -11,8 +12,10 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @Log4j2
@@ -24,15 +27,35 @@ public class LoginAndRegisterRestController
     private final LoginAndRegisterMapper mapper;
     private final UserMapper userMapper;
 
-    @PostMapping("/register")
-    public ResponseEntity<RegisterResponseDto> registerUser(@RequestBody @Valid RegisterRequest registerRequest) {
-        log.info("Register request: " + registerRequest.toString());
-        final RegisterResponseDto userResponse = loginAndRegisterService.register(registerRequest);
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> registerUser(
+            @RequestPart("data") @Valid RegisterRequest registerRequest,
+            @RequestPart("photos") MultipartFile[] photos) {
 
-        log.info("User registered: {}", userResponse);
+        log.info("Register request: {}", registerRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(userResponse);
+        if (photos == null || photos.length == 0) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ErrorResponse("At least one photo must be uploaded."));
+        }
+
+        if (photos.length > 5) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new ErrorResponse("Maximum 5 photos are allowed."));
+        }
+
+
+        try {
+            RegisterResponseDto responseDto = loginAndRegisterService.register(registerRequest, photos);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+        } catch (Exception ex) {
+            log.error("Registration with photos failed", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
+
 
     @GetMapping("/find/{login}")
     public ResponseEntity<LoginResponseDto> findUser(@PathVariable String login) {
