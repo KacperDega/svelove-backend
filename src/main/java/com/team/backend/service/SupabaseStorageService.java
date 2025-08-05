@@ -36,7 +36,7 @@ public class SupabaseStorageService {
 
     public String uploadImage(MultipartFile file, Long userId) throws IOException {
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId cannot be null");
+            throw new IllegalArgumentException("Parameter userId cannot be null.");
         }
 
         checkPhotoLimit(userId);
@@ -56,17 +56,17 @@ public class SupabaseStorageService {
 
     private void checkPhotoLimit(Long userId) {
         User user = userService.getUserById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found."));
 
         if (user.getPhotoUrls().size() >= 5) {
-            throw new IllegalStateException("Max 5 photos per user allowed");
+            throw new IllegalStateException("Max 5 photos per user allowed.");
         }
     }
 
 
     private void validateFile(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("File must not be empty");
+            throw new IllegalArgumentException("File must not be empty.");
         }
 
         String contentType = file.getContentType();

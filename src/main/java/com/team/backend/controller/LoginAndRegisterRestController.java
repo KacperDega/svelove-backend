@@ -37,13 +37,13 @@ public class LoginAndRegisterRestController
         if (photos == null || photos.length == 0) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ErrorResponse("At least one photo must be uploaded."));
+                    .body("At least one photo must be uploaded.");
         }
 
         if (photos.length > 5) {
             return ResponseEntity
                     .badRequest()
-                    .body(new ErrorResponse("Maximum 5 photos are allowed."));
+                    .body("Max 5 photos per user allowed.");
         }
 
 
