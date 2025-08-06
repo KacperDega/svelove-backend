@@ -10,6 +10,7 @@ public record UserProfileDto(
         List<String> hobbies,
         String description,
         String localization,
+        List<String> photoUrls,
         int age,
         int age_min,
         int age_max
