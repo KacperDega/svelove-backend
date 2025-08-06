@@ -70,7 +70,7 @@ class UserServiceTest {
     void updateUser_shouldUpdateAllFields() {
         UserProfileUpdateDto dto = new UserProfileUpdateDto(
                 "newUsername", "BOTH", List.of(1L),
-                "desc", "loc", 20, 30);
+                "desc", "loc", 18, 20, 30);
 
         Hobby hobby = new Hobby();
         hobby.setName(HobbyEnum.SWIMMING);
@@ -80,7 +80,7 @@ class UserServiceTest {
         when(hobbyService.getHobbiesByIdList(dto.hobbyIds())).thenReturn(hobbies);
         when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        User updatedUser = userService.updateUser(user, dto, false);
+        User updatedUser = userService.updateUser(user, dto);
 
         assertEquals("newUsername", updatedUser.getUsername());
         assertEquals(Preference.BOTH, updatedUser.getPreference());

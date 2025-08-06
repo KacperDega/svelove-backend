@@ -62,10 +62,8 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
-    public User updateUser(User user, UserProfileUpdateDto updateDto, boolean config) {
-        if (!config) {
-            user.setUsername(updateDto.username());
-        }
+    public User updateUser(User user, UserProfileUpdateDto updateDto) {
+        user.setUsername(updateDto.username());
         user.setPreference(Preference.valueOf(updateDto.preference()));
 
         List<Hobby> hobbies = hobbyService.getHobbiesByIdList(updateDto.hobbyIds());
@@ -73,6 +71,7 @@ public class UserService {
 
         user.setDescription(updateDto.description());
         user.setLocalization(updateDto.localization());
+        user.setAge(updateDto.age());
         user.setAge_min(updateDto.ageMin());
         user.setAge_max(updateDto.ageMax());
 
