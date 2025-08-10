@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 class UserServiceTest {
 
     @Mock private UserRepository userRepository;
-    @Mock private PasswordEncoderService passwordEncoderService;
+    @Mock private EncoderService encoderService;
     @Mock private HobbyService hobbyService;
 
     @InjectMocks private UserService userService;
@@ -46,8 +46,8 @@ class UserServiceTest {
         PasswordChangeRequest request = new PasswordChangeRequest("oldPassword", "newPassword");
 
         when(userRepository.findByLogin("testuser")).thenReturn(Optional.of(user));
-        when(passwordEncoderService.matches("oldPassword", "encodedOldPassword")).thenReturn(true);
-        when(passwordEncoderService.encodePassword("newPassword")).thenReturn("encodedNewPassword");
+        when(encoderService.matches("oldPassword", "encodedOldPassword")).thenReturn(true);
+        when(encoderService.encodePassword("newPassword")).thenReturn("encodedNewPassword");
         when(userRepository.save(any())).thenReturn(user);
 
         User result = userService.changePassword("testuser", request);
@@ -60,7 +60,7 @@ class UserServiceTest {
         PasswordChangeRequest request = new PasswordChangeRequest("wrongOld", "newPassword");
 
         when(userRepository.findByLogin("testuser")).thenReturn(Optional.of(user));
-        when(passwordEncoderService.matches("wrongOld", "encodedOldPassword")).thenReturn(false);
+        when(encoderService.matches("wrongOld", "encodedOldPassword")).thenReturn(false);
 
         assertThrows(IllegalArgumentException.class, () ->
                 userService.changePassword("testuser", request));
@@ -70,7 +70,7 @@ class UserServiceTest {
     void updateUser_shouldUpdateAllFields() {
         UserProfileUpdateDto dto = new UserProfileUpdateDto(
                 "newUsername", "BOTH", List.of(1L),
-                "desc", "loc", 20, 30);
+                "desc", "loc", 18, 20, 30);
 
         Hobby hobby = new Hobby();
         hobby.setName(HobbyEnum.SWIMMING);
@@ -80,7 +80,7 @@ class UserServiceTest {
         when(hobbyService.getHobbiesByIdList(dto.hobbyIds())).thenReturn(hobbies);
         when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
-        User updatedUser = userService.updateUser(user, dto, false);
+        User updatedUser = userService.updateUser(user, dto);
 
         assertEquals("newUsername", updatedUser.getUsername());
         assertEquals(Preference.BOTH, updatedUser.getPreference());

@@ -28,43 +28,26 @@ public class UserProfileController {
         return ResponseEntity.ok(userProfileDto);
     }
 
-    @PostMapping("/config")
-    public ResponseEntity<?> configureProfile(@RequestBody UserProfileUpdateDto updateDto,
-                                              Authentication authentication,
-                                              BindingResult result)
-    {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result.getAllErrors());
-        }
-
-        String username = authentication.getName();
-        User currentUser = userService.getUserByUsername(username);
-
-        userService.updateUser(currentUser, updateDto, true);
-        return ResponseEntity.ok("Profile configured");
-    }
-
-    @PostMapping("/edit")
+    @PatchMapping("/edit")
     public ResponseEntity<?> editProfile(@RequestBody UserProfileUpdateDto updateDto,
-                                              Authentication authentication,
-                                              BindingResult result)
-    {
+                                         Authentication authentication,
+                                         BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors());
         }
 
-        String username = authentication.getName();
-        User currentUser = userService.getUserByUsername(username);
+        String login = authentication.getName();
+        User currentUser = userService.getUserByLogin(login);
 
-        userService.updateUser(currentUser, updateDto, false);
+        userService.updateUser(currentUser, updateDto);
         return ResponseEntity.ok("Profile updated");
     }
 
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody @Valid PasswordChangeRequest request, Authentication authentication) {
-        String username = authentication.getName();
+        String login = authentication.getName();
 
-        userService.changePassword(username, request);
+        userService.changePassword(login, request);
 
         return ResponseEntity.ok("Password changed successfully");
     }

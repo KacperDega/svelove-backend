@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -67,6 +68,11 @@ public class User implements UserDetails {
     )
     private List<Hobby> hobbies;
 
+    @ElementCollection
+    @OrderColumn(name = "photo_order")
+    @Column(name = "photo_url")
+    private List<String> photoUrls = new ArrayList<>();
+
     @OneToMany(mappedBy = "firstUser")
     private List<Match> matchesAsFirstUser;
 
@@ -75,7 +81,7 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user")
     private List<PairStatus> pairStatuses;
-
+    
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

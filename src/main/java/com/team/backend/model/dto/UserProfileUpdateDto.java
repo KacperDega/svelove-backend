@@ -22,10 +22,10 @@ public record UserProfileUpdateDto(
         @NotBlank
         String localization,
 
-//        @NotNull
-//        @Min(18)
-//        @Max(100)
-//        Integer age,
+        @NotNull
+        @Min(18)
+        @Max(100)
+        Integer age,
 
         @NotNull
         @Min(18)

@@ -22,7 +22,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoderService passwordEncoderService;
+    private final EncoderService encoderService;
     private final HobbyService hobbyService;
 
     public Optional<User> getUserById(Long id) {
@@ -33,6 +33,10 @@ public class UserService {
         return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
+    public User getUserByLogin(String login) {
+        return userRepository.findByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found: " + login));
+    }
+
     @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
@@ -40,10 +44,10 @@ public class UserService {
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        String login = authentication.getName();
 
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        return userRepository.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + login));
     }
 
     public User getCurrentUser(Authentication authentication) {
@@ -51,21 +55,19 @@ public class UserService {
             throw new UsernameNotFoundException("User not authenticated");
         }
 
-        String username = authentication.getName();
+        String login = authentication.getName();
 
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        return userRepository.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + login));
     }
 
-    public UserDetails loadUserByLogin(String username) {
-        return userRepository.findByLogin(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public UserDetails loadUserByLogin(String login) {
+        return userRepository.findByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + login));
     }
 
-    public User updateUser(User user, UserProfileUpdateDto updateDto, boolean config) {
-        if (!config) {
-            user.setUsername(updateDto.username());
-        }
+    public User updateUser(User user, UserProfileUpdateDto updateDto) {
+        user.setUsername(updateDto.username());
         user.setPreference(Preference.valueOf(updateDto.preference()));
 
         List<Hobby> hobbies = hobbyService.getHobbiesByIdList(updateDto.hobbyIds());
@@ -73,21 +75,25 @@ public class UserService {
 
         user.setDescription(updateDto.description());
         user.setLocalization(updateDto.localization());
+        user.setAge(updateDto.age());
         user.setAge_min(updateDto.ageMin());
         user.setAge_max(updateDto.ageMax());
 
         return userRepository.save(user);
     }
 
-    public User changePassword(String username, PasswordChangeRequest request) {
-        User user = userRepository.findByLogin(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    public User changePassword(String login, PasswordChangeRequest request) {
+        User user = getUserByLogin(login);
 
-        if (!passwordEncoderService.matches(request.oldPassword(), user.getPassword())) {
+        if (!encoderService.matches(request.oldPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Old password is incorrect");
         }
 
-        user.setPassword(passwordEncoderService.encodePassword(request.newPassword()));
+        user.setPassword(encoderService.encodePassword(request.newPassword()));
+        return userRepository.save(user);
+    }
+
+    public User saveUser(User user) {
         return userRepository.save(user);
     }
 }
