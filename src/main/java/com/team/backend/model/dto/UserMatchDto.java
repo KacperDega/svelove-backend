@@ -13,5 +13,6 @@ public record UserMatchDto(
         String localization,
         Preference preference,
         List<String> hobbies,
-        String description
+        String description,
+        List<String> photoUrls
 ) {}

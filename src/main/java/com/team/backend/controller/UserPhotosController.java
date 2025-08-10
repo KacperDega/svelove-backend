@@ -16,7 +16,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/profile/photos")
 @RequiredArgsConstructor
-public class ProfilePhotosController {
+public class UserPhotosController {
 
     private final UserService userService;
     private final PhotoService photoService;

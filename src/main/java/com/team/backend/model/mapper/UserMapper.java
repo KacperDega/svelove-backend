@@ -73,7 +73,8 @@ public class UserMapper {
                 user.getHobbies().stream()
                                 .map(Hobby::getHobbyName)
                                 .toList(),
-                user.getDescription()
+                user.getDescription(),
+                user.getPhotoUrls()
         );
     }
 
