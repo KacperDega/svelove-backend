@@ -3,10 +3,10 @@ name: Java CI
 on:
   push:
     branches:
-      - 'main'
+      - '**'
   pull_request:
     branches:
-      - 'main'
+      - '**' 
 
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
         path: target/surefire-reports
 
     - name: Notify Success
-      if: ${{ steps.tests.outcome == 'success' }}
+      if: ${{ steps.tests.outcome == 'success' && github.ref == 'refs/heads/main' }}
       run: |
         LAST_LINES=$(tail -n 10 test-results.txt)
         MESSAGE="All tests have passed successfully. The commit can be merged.
@@ -44,7 +44,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
       
     - name: Notify Failure  
-      if: ${{ steps.tests.outcome == 'failure' }}
+      if: ${{ steps.tests.outcome == 'failure' && github.ref == 'refs/heads/main' }}
       run: |
         LAST_LINES=$(tail -n 10 test-results.txt)
         MESSAGE="Some tests have failed. Please fix the issues before merging the commit.
