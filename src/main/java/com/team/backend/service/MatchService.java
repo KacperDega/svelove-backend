@@ -102,8 +102,8 @@ public class MatchService {
         return filteredUsers.subList(0, 30);
     }
 
-    public boolean handleLike(String username, Long likedUserId) {
-        User likingUser = userRepository.findByUsername(username)
+    public boolean handleLike(String login, Long likedUserId) {
+        User likingUser = userRepository.findByLogin(login)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         User likedUser = userRepository.findById(likedUserId)

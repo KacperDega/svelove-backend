@@ -40,9 +40,9 @@ public class MatchController {
 
     @PostMapping("/like/{likedUserId}")
     public ResponseEntity<?> likeUser(@PathVariable Long likedUserId, Authentication authentication) {
-        String username = authentication.getName();
+        String login = authentication.getName();
 
-        boolean matchCreated = matchService.handleLike(username, likedUserId);
+        boolean matchCreated = matchService.handleLike(login, likedUserId);
 
         if (matchCreated) {
             return ResponseEntity.ok("Match created");
@@ -53,8 +53,7 @@ public class MatchController {
 
     @GetMapping("/all")
     public ResponseEntity<List<MatchDto>> getUserMatches(Authentication authentication) {
-        String username = authentication.getName();
-        User currentUser = userService.getUserByUsername(username);
+        User currentUser = userService.getCurrentUser(authentication);
 
 
         List<MatchDto> result = matchService.getUserMatches(currentUser)

@@ -78,10 +78,10 @@ class MatchServiceTest {
 
     @Test
     void handleLike_shouldThrow_whenLikingUserNotFound() {
-        when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
+        when(userRepository.findByLogin("unknownLogin")).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> {
-            matchService.handleLike("unknown", 2L);
+            matchService.handleLike("unknownLogin", 2L);
         });
     }
 
@@ -105,13 +105,13 @@ class MatchServiceTest {
 
     @Test
     void handleLike_shouldCreateMatchAndDeletePendingPair_whenBothLiked() {
-        when(userRepository.findByUsername("liker")).thenReturn(Optional.of(likingUser));
+        when(userRepository.findByLogin("likerLogin")).thenReturn(Optional.of(likingUser));
         when(userRepository.findById(2L)).thenReturn(Optional.of(likedUser));
         when(pendingPairService.getOrCreatePendingPair(likingUser, likedUser)).thenReturn(pendingPair);
 
         when(pendingPairService.bothUsersLiked(pendingPair)).thenReturn(true);
 
-        boolean result = matchService.handleLike("liker", 2L);
+        boolean result = matchService.handleLike("likerLogin", 2L);
 
         assertTrue(result);
         verify(pendingPairService).updatePairStatus(pendingPair, likingUser, LikedStatus.LIKED);
@@ -121,13 +121,13 @@ class MatchServiceTest {
 
     @Test
     void handleLike_shouldNotCreateMatch_whenOnlyOneSideLiked() {
-        when(userRepository.findByUsername("liker")).thenReturn(Optional.of(likingUser));
+        when(userRepository.findByLogin("likerLogin")).thenReturn(Optional.of(likingUser));
         when(userRepository.findById(2L)).thenReturn(Optional.of(likedUser));
         when(pendingPairService.getOrCreatePendingPair(likingUser, likedUser)).thenReturn(pendingPair);
 
         when(pendingPairService.bothUsersLiked(pendingPair)).thenReturn(false);
 
-        boolean result = matchService.handleLike("liker", 2L);
+        boolean result = matchService.handleLike("likerLogin", 2L);
 
         assertFalse(result);
         verify(pendingPairService).updatePairStatus(pendingPair, likingUser, LikedStatus.LIKED);
