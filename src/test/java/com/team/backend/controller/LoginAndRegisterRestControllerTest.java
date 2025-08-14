@@ -55,14 +55,13 @@ class LoginAndRegisterRestControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    //TODO: ADAPT TEST TO REGISTER CHANGES
     @Test
     @WithMockUser
     void shouldRegisterUserSuccessfully() throws Exception {
         // Given
         RegisterRequest registerRequest =
                 new RegisterRequest("testUser", "testLogin", "password123", Sex.MALE, Preference.BOTH, "I am a test user", 25,
-                20, 30, "Warsaw", List.of(Hobby.fromString("Reading")));
+                20, 30, 1L, List.of(Hobby.fromString("Reading")));
         LoginRequest loginRequest = new LoginRequest("testUser", "testLogin", "encodedPassword123");
         LoginResponseDto loginResponseDto = new LoginResponseDto("testUser", "testLogin", "testPassword");
         RegisterResponseDto expectedResponse = new RegisterResponseDto("testUser", "testLogin", "REGISTERED");
