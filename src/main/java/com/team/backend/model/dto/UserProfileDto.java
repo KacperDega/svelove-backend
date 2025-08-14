@@ -9,7 +9,7 @@ public record UserProfileDto(
         String preference,
         List<String> hobbies,
         String description,
-        String localization,
+        String city,
         List<String> photoUrls,
         int age,
         int age_min,

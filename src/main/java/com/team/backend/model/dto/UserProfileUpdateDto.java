@@ -20,7 +20,7 @@ public record UserProfileUpdateDto(
         String description,
 
         @NotBlank
-        String localization,
+        Long cityId,
 
         @NotNull
         @Min(18)

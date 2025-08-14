@@ -1,5 +1,6 @@
 package com.team.backend.model.dto;
 
+import com.team.backend.model.Enum.HobbyEnum;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Enum.Sex;
 import com.team.backend.model.Hobby;
@@ -41,17 +42,15 @@ public record RegisterRequest(
         @NotNull(message = "{age.not.null}")
         @Min(18)
         @Max(100)
-        Integer age_min,
+        Integer ageMin,
 
         @NotNull(message = "{age.not.null}")
         @Min(18)
         @Max(100)
-        Integer age_max,
+        Integer ageMax,
 
-        @NotNull(message = "{localization.not.null}")
-        @NotEmpty(message = "{localization.not.empty}")
-        @NotBlank(message = "{localization.not.blank}")
-        String localization,
+        @NotNull(message = "{city_id.not.null}")
+        Long cityId,
 
         @NotNull(message = "{hobby_list.not.null}")
         List<Hobby> hobbies

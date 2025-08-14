@@ -1,11 +1,13 @@
 package com.team.backend.model.mapper;
 
 
+import com.team.backend.model.City;
 import com.team.backend.model.Enum.HobbyEnum;
 import com.team.backend.model.Hobby;
 import com.team.backend.model.User;
 import com.team.backend.model.dto.*;
 import com.team.backend.repository.HobbyRepository;
+import com.team.backend.service.CityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log4j2
 public class UserMapper {
+
     private final HobbyRepository hobbyRepository;
+    private final CityService cityService;
 
     public User mapToUser(RegisterRequest userRequest) {
+
+        City city = cityService.getCityByIdOrThrow(userRequest.cityId());
 
         List<Hobby> hobbies = userRequest.hobbies().stream()
                 .map(hobbyEntity -> {
@@ -34,8 +40,6 @@ public class UserMapper {
                     }
                 })
                 .collect(Collectors.toList());
-
-
         log.debug(hobbies.toString());
 
         return User.of(
@@ -46,9 +50,9 @@ public class UserMapper {
                 userRequest.preference(),
                 userRequest.description(),
                 userRequest.age(),
-                userRequest.age_min(),
-                userRequest.age_max(),
-                userRequest.localization(),
+                userRequest.ageMin(),
+                userRequest.ageMax(),
+                city,
                 hobbies
         );
     }
@@ -68,7 +72,7 @@ public class UserMapper {
                 user.getUsername(),
                 user.getSex(),
                 user.getAge(),
-                user.getLocalization(),
+                user.getCity().getName(),
                 user.getPreference(),
                 user.getHobbies().stream()
                                 .map(Hobby::getHobbyName)
@@ -88,7 +92,7 @@ public class UserMapper {
                 user.getPreference().getDisplayName(),
                 user.getHobbies().stream().map(Hobby::getHobbyName).toList(),
                 user.getDescription(),
-                user.getLocalization(),
+                user.getCity().getName(),
                 user.getPhotoUrls(),
                 user.getAge(),
                 user.getAge_min(),

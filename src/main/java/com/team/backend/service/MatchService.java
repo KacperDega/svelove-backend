@@ -1,23 +1,19 @@
 package com.team.backend.service;
 
-import com.team.backend.exception.GlobalExceptionHandler;
 import com.team.backend.model.Enum.Sex;
 import com.team.backend.model.Hobby;
 import com.team.backend.model.Enum.LikedStatus;
 import com.team.backend.model.Match;
 import com.team.backend.model.User;
 import com.team.backend.model.PendingPair;
-import com.team.backend.model.User;
 import com.team.backend.model.dto.MessageResponseDto;
 import com.team.backend.model.mapper.MessageMapper;
 import com.team.backend.repository.MatchRepository;
 import com.team.backend.repository.MessageRepository;
 import com.team.backend.repository.PendingPairRepository;
 import com.team.backend.repository.UserRepository;
-import com.team.backend.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -28,7 +24,7 @@ import java.util.stream.Collectors;
 import com.team.backend.model.Enum.Preference;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MatchService {
 
     private final MatchRepository matchRepository;
@@ -70,7 +66,7 @@ public class MatchService {
                 user.getId(),
                 user.getAge_min(),
                 user.getAge_max(),
-               user.getLocalization()
+                user.getCity().getId()
         );
 
         Set<Long> matchedUserIds = matchRepository.findAllMatchesForUser(user).stream()
