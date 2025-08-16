@@ -1,6 +1,5 @@
 package com.team.backend.service;
 
-import com.team.backend.model.Enum.HobbyEnum;
 import com.team.backend.model.Hobby;
 import com.team.backend.repository.HobbyRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,8 +15,6 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -35,13 +32,11 @@ class HobbyServiceTest {
 
     @BeforeEach
     void setUp() {
-        hobby1 = new Hobby();
+        hobby1 = new Hobby("reading", "Reading");
         hobby1.setId(1L);
-        hobby1.setName(HobbyEnum.READING);
 
-        hobby2 = new Hobby();
+        hobby2 = new Hobby("swimming", "Swimming");
         hobby2.setId(2L);
-        hobby2.setName(HobbyEnum.SWIMMING);
     }
 
     @Test

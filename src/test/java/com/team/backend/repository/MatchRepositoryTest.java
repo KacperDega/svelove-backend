@@ -48,15 +48,15 @@ class MatchRepositoryTest {
         cityRepository.save(gdansk);
 
         user1 = User.of("user1", "login1", "pass", Sex.MALE, Preference.WOMEN,
-                "Hello, I'm user1", 25, 20, 30, warsaw, List.of(Hobby.fromString("Reading")));
+                "Hello, I'm user1", 25, 20, 30, warsaw, List.of(new Hobby("reading", "Reading")));
         userRepository.save(user1);
 
         user2 = User.of("user2", "login2", "pass", Sex.FEMALE, Preference.MEN,
-                "Hello, I'm user2", 23, 22, 35, krakow, List.of(Hobby.fromString("Cooking")));
+                "Hello, I'm user2", 23, 22, 35, krakow, List.of(new Hobby("cooking", "Cooking")));
         userRepository.save(user2);
 
         user3 = User.of("user3", "login3", "pass", Sex.FEMALE, Preference.WOMEN,
-                "Hello, I'm user3", 27, 25, 40, gdansk, List.of(Hobby.fromString("Listening to Music")));
+                "Hello, I'm user3", 27, 25, 40, gdansk, List.of(new Hobby("music", "Music")));
         userRepository.save(user3);
     }
 
