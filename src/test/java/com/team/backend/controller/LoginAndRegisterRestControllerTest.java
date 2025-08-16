@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.team.backend.config.security.JwtConfigProperties;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Enum.Sex;
-import com.team.backend.model.Hobby;
 import com.team.backend.model.dto.LoginRequest;
 import com.team.backend.model.dto.LoginResponseDto;
 import com.team.backend.model.dto.RegisterRequest;
@@ -61,9 +60,7 @@ class LoginAndRegisterRestControllerTest {
         // Given
         RegisterRequest registerRequest =
                 new RegisterRequest("testUser", "testLogin", "password123", Sex.MALE, Preference.BOTH, "I am a test user", 25,
-                20, 30, 1L, List.of(Hobby.fromString("Reading")));
-        LoginRequest loginRequest = new LoginRequest("testUser", "testLogin", "encodedPassword123");
-        LoginResponseDto loginResponseDto = new LoginResponseDto("testUser", "testLogin", "testPassword");
+                20, 30, 1L, List.of("reading") );
         RegisterResponseDto expectedResponse = new RegisterResponseDto("testUser", "testLogin", "REGISTERED");
 
         MockMultipartFile jsonPart = new MockMultipartFile(

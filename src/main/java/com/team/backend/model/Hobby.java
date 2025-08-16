@@ -1,41 +1,30 @@
 package com.team.backend.model;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.team.backend.model.Enum.HobbyEnum;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Setter
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "hobby")
-public class Hobby
-{
+public class Hobby {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Long id;
 
-    @NonNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "name", nullable = false)
-    private HobbyEnum name;
+    @Column(name = "name", nullable = false, unique = true)
+    private String name;
 
-    public String getHobbyName() {
-        return name.getDisplayName();
-    }
+    @Column(name = "label", nullable = false)
+    private String label;
 
-    @JsonCreator
-    public static Hobby fromString(String hobbyName) {
-        Hobby hobby = new Hobby();
-        hobby.setName(HobbyEnum.fromDisplayName(hobbyName));
-        return hobby;
-    }
-
-    @JsonValue
-    public String toJson() {
-        return name.toString();
+    public Hobby(String name, String label) {
+        this.name = name;
+        this.label = label;
     }
 }
