@@ -2,7 +2,6 @@ package com.team.backend.model.mapper;
 
 
 import com.team.backend.model.City;
-import com.team.backend.model.Enum.HobbyEnum;
 import com.team.backend.model.Hobby;
 import com.team.backend.model.User;
 import com.team.backend.model.dto.*;
@@ -13,7 +12,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,18 +26,9 @@ public class UserMapper {
         City city = cityService.getCityByIdOrThrow(userRequest.cityId());
 
         List<Hobby> hobbies = userRequest.hobbies().stream()
-                .map(hobbyEntity -> {
-                    HobbyEnum enumHobby = hobbyEntity.getName();
-                    List<Hobby> existing = hobbyRepository.findByName(enumHobby);
-                    if (!existing.isEmpty()) {
-                        return existing.get(0);
-                    } else {
-                        Hobby newHobby = new Hobby();
-                        newHobby.setName(enumHobby);
-                        return hobbyRepository.save(newHobby);
-                    }
-                })
-                .collect(Collectors.toList());
+                .map(hobbyName -> hobbyRepository.findByName(hobbyName)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid hobby: " + hobbyName)))
+                .toList();
         log.debug(hobbies.toString());
 
         return User.of(
@@ -58,7 +47,7 @@ public class UserMapper {
     }
 
     public RegisterResponseDto mapToRegisterResponse(User user) {
-        String responseMessage = "REGISTERED";
+        // String responseMessage = "REGISTERED";
         return new RegisterResponseDto(user.getUsername(), user.getLogin(), "REGISTERED");
     }
 
@@ -75,13 +64,12 @@ public class UserMapper {
                 user.getCity().getName(),
                 user.getPreference(),
                 user.getHobbies().stream()
-                                .map(Hobby::getHobbyName)
-                                .toList(),
+                        .map(Hobby::getName)
+                        .toList(),
                 user.getDescription(),
                 user.getPhotoUrls()
         );
     }
-
 
 
     public static UserProfileDto mapToUserProfileDto(User user) {
@@ -90,7 +78,9 @@ public class UserMapper {
                 user.getLogin(),
                 user.getSex().getDisplayName(),
                 user.getPreference().getDisplayName(),
-                user.getHobbies().stream().map(Hobby::getHobbyName).toList(),
+                user.getHobbies().stream()
+                        .map(Hobby::getName)
+                        .toList(),
                 user.getDescription(),
                 user.getCity().getName(),
                 user.getPhotoUrls(),
