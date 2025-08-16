@@ -1,5 +1,6 @@
 package com.team.backend.repository;
 
+import com.team.backend.model.City;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Enum.Sex;
 import com.team.backend.model.Hobby;
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
 
@@ -24,7 +24,10 @@ class MatchRepositoryTest {
     private MatchRepository matchRepository;
 
     @Autowired
-    private TestEntityManager entityManager;
+    private UserRepository userRepository;
+
+    @Autowired
+    private CityRepository cityRepository;
 
     private User user1;
     private User user2;
@@ -32,21 +35,30 @@ class MatchRepositoryTest {
 
     @BeforeEach
     void setup() {
+        City warsaw = new City();
+        warsaw.setName("Warsaw");
+        cityRepository.save(warsaw);
+
+        City krakow = new City();
+        krakow.setName("Krakow");
+        cityRepository.save(krakow);
+
+        City gdansk = new City();
+        gdansk.setName("Gdansk");
+        cityRepository.save(gdansk);
+
         user1 = User.of("user1", "login1", "pass", Sex.MALE, Preference.WOMEN,
-                "Hello, I'm user1", 25, 20, 30, "Warsaw", List.of(Hobby.fromString("Reading")));
+                "Hello, I'm user1", 25, 20, 30, warsaw, List.of(Hobby.fromString("Reading")));
+        userRepository.save(user1);
 
         user2 = User.of("user2", "login2", "pass", Sex.FEMALE, Preference.MEN,
-                "Hello, I'm user2", 23, 22, 35, "Krakow", List.of(Hobby.fromString("Cooking")));
+                "Hello, I'm user2", 23, 22, 35, krakow, List.of(Hobby.fromString("Cooking")));
+        userRepository.save(user2);
 
         user3 = User.of("user3", "login3", "pass", Sex.FEMALE, Preference.WOMEN,
-                "Hello, I'm user3", 27, 25, 40, "Gdansk", List.of(Hobby.fromString("Listening to Music")));
-
-
-        entityManager.persist(user1);
-        entityManager.persist(user2);
-        entityManager.persist(user3);
+                "Hello, I'm user3", 27, 25, 40, gdansk, List.of(Hobby.fromString("Listening to Music")));
+        userRepository.save(user3);
     }
-
 
     @Test
     void shouldFindAllMatchesForUser() {
@@ -54,10 +66,9 @@ class MatchRepositoryTest {
         Match match2 = new Match(user2, user3);
         Match match3 = new Match(user1, user3);
 
-        entityManager.persist(match1);
-        entityManager.persist(match2);
-        entityManager.persist(match3);
-        entityManager.flush();
+        matchRepository.save(match1);
+        matchRepository.save(match2);
+        matchRepository.save(match3);
 
         List<Match> matchesForUser1 = matchRepository.findAllMatchesForUser(user1);
         List<Match> matchesForUser2 = matchRepository.findAllMatchesForUser(user2);
@@ -76,4 +87,3 @@ class MatchRepositoryTest {
         assertFalse(matchesForUser3.contains(match1));
     }
 }
-

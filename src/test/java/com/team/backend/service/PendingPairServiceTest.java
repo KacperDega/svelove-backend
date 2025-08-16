@@ -1,12 +1,9 @@
 package com.team.backend.service;
 
+import com.team.backend.model.*;
 import com.team.backend.model.Enum.LikedStatus;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Enum.Sex;
-import com.team.backend.model.Hobby;
-import com.team.backend.model.PairStatus;
-import com.team.backend.model.PendingPair;
-import com.team.backend.model.User;
 import com.team.backend.repository.PairStatusRepository;
 import com.team.backend.repository.PendingPairRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -41,12 +39,20 @@ class PendingPairServiceTest {
 
     @BeforeEach
     void setup() {
+        City warsaw = new City();
+        warsaw.setId(1L);
+        warsaw.setName("Warsaw");
+
+        City krakow = new City();
+        krakow.setId(2L);
+        krakow.setName("Krakow");
+
         user1 = User.of("user1", "login1", "pass", Sex.MALE, Preference.WOMEN,
-                "Hello, I'm user1", 25, 20, 30, "Warsaw", List.of(Hobby.fromString("Reading")));
+                "Hello, I'm user1", 25, 20, 30, warsaw, List.of(Hobby.fromString("Reading")));
         user1.setId(1L);
 
         user2 = User.of("user2", "login2", "pass", Sex.FEMALE, Preference.MEN,
-                "Hello, I'm user2", 23, 22, 35, "Krakow", List.of(Hobby.fromString("Cooking")));
+                "Hello, I'm user2", 23, 22, 35, krakow, List.of(Hobby.fromString("Cooking")));
         user2.setId(2L);
 
     }

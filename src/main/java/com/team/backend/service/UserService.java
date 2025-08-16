@@ -1,29 +1,32 @@
 package com.team.backend.service;
 
+import com.team.backend.model.City;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Hobby;
 import com.team.backend.model.User;
 import com.team.backend.model.dto.PasswordChangeRequest;
 import com.team.backend.model.dto.UserProfileUpdateDto;
 import com.team.backend.repository.UserRepository;
-import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final EncoderService encoderService;
     private final HobbyService hobbyService;
+    private final CityService cityService;
 
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
@@ -74,13 +77,17 @@ public class UserService {
         user.setHobbies(hobbies);
 
         user.setDescription(updateDto.description());
-        user.setLocalization(updateDto.localization());
+
+        City city = cityService.getCityByIdOrThrow(updateDto.cityId());
+        user.setCity(city);
+
         user.setAge(updateDto.age());
         user.setAge_min(updateDto.ageMin());
         user.setAge_max(updateDto.ageMax());
 
         return userRepository.save(user);
     }
+
 
     public User changePassword(String login, PasswordChangeRequest request) {
         User user = getUserByLogin(login);

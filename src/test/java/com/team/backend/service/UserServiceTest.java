@@ -1,5 +1,6 @@
 package com.team.backend.service;
 
+import com.team.backend.model.City;
 import com.team.backend.model.Enum.HobbyEnum;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Hobby;
@@ -29,13 +30,14 @@ class UserServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private EncoderService encoderService;
     @Mock private HobbyService hobbyService;
+    @Mock private CityService cityService;
 
     @InjectMocks private UserService userService;
 
     private User user;
 
     @BeforeEach
-    void setUp() {
+    void setup() {
         user = new User();
         user.setUsername("testuser");
         user.setPassword("encodedOldPassword");
@@ -70,14 +72,19 @@ class UserServiceTest {
     void updateUser_shouldUpdateAllFields() {
         UserProfileUpdateDto dto = new UserProfileUpdateDto(
                 "newUsername", "BOTH", List.of(1L),
-                "desc", "loc", 18, 20, 30);
+                "desc", 1L, 18, 20, 30);
 
         Hobby hobby = new Hobby();
         hobby.setName(HobbyEnum.SWIMMING);
         hobby.setId(1L);
         List<Hobby> hobbies = List.of(hobby);
 
+        City city = new City();
+        city.setId(1L);
+        city.setName("Warsaw");
+
         when(hobbyService.getHobbiesByIdList(dto.hobbyIds())).thenReturn(hobbies);
+        when(cityService.getCityByIdOrThrow(1L)).thenReturn(city);
         when(userRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         User updatedUser = userService.updateUser(user, dto);
@@ -86,8 +93,8 @@ class UserServiceTest {
         assertEquals(Preference.BOTH, updatedUser.getPreference());
         assertEquals(hobbies, updatedUser.getHobbies());
         assertEquals("desc", updatedUser.getDescription());
-        assertEquals("loc", updatedUser.getLocalization());
-//        assertEquals(25, updatedUser.getAge());
+        assertEquals(1L, updatedUser.getCity().getId());
+        assertEquals(18, updatedUser.getAge());
         assertEquals(20, updatedUser.getAge_min());
         assertEquals(30, updatedUser.getAge_max());
     }

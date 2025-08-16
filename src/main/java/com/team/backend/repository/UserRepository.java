@@ -27,10 +27,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u " +
             "WHERE u.id <> :currentUserId " +
             "AND u.age BETWEEN :ageMin AND :ageMax " +
-            "AND u.localization = :localization")
+            "AND u.city.id = :cityId")
     List<User> findFilteredByAgeAndLocation(@Param("currentUserId") Long currentUserId,
                                             @Param("ageMin") int ageMin,
                                             @Param("ageMax") int ageMax,
-                                            @Param("localization") String localization);
+                                            @Param("cityId") Long cityId);
 
 }

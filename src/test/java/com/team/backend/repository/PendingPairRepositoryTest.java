@@ -1,17 +1,13 @@
 package com.team.backend.repository;
 
+import com.team.backend.model.*;
 import com.team.backend.model.Enum.LikedStatus;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Enum.Sex;
-import com.team.backend.model.Hobby;
-import com.team.backend.model.PairStatus;
-import com.team.backend.model.PendingPair;
-import com.team.backend.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,33 +22,46 @@ class PendingPairRepositoryTest {
     private PendingPairRepository pendingPairRepository;
 
     @Autowired
-    private TestEntityManager entityManager;
+    private UserRepository userRepository;
+
+    @Autowired
+    private CityRepository cityRepository;
+
+    @Autowired
+    private PairStatusRepository pairStatusRepository;
 
     private User user1;
     private User user2;
 
     @BeforeEach
     void setup() {
+        City warsaw = new City();
+        warsaw.setName("Warsaw");
+        cityRepository.save(warsaw);
+
+        City krakow = new City();
+        krakow.setName("Krakow");
+        cityRepository.save(krakow);
+
         user1 = User.of("user1", "login1", "pass", Sex.MALE, Preference.WOMEN,
-                "Hello, I'm user1", 25, 20, 30, "Warsaw", List.of(Hobby.fromString("Reading")));
+                "Hello, I'm user1", 25, 20, 30, warsaw, List.of(Hobby.fromString("Reading")));
+        userRepository.save(user1);
 
         user2 = User.of("user2", "login2", "pass", Sex.FEMALE, Preference.MEN,
-                "Hello, I'm user2", 23, 22, 35, "Krakow", List.of(Hobby.fromString("Cooking")));
-
-        entityManager.persist(user1);
-        entityManager.persist(user2);
+                "Hello, I'm user2", 23, 22, 35, krakow, List.of(Hobby.fromString("Cooking")));
+        userRepository.save(user2);
     }
 
     @Test
     void shouldFindPendingPairRegardlessOfUserOrder() {
         PairStatus status1 = new PairStatus(user1, LikedStatus.PENDING);
+        pairStatusRepository.save(status1);
+
         PairStatus status2 = new PairStatus(user2, LikedStatus.PENDING);
-        entityManager.persist(status1);
-        entityManager.persist(status2);
+        pairStatusRepository.save(status2);
 
         PendingPair pendingPair = new PendingPair(status1, status2);
-        entityManager.persist(pendingPair);
-        entityManager.flush();
+        pendingPairRepository.save(pendingPair);
 
         Optional<PendingPair> found1 = pendingPairRepository.findByUsers(user1, user2);
         assertTrue(found1.isPresent());
@@ -63,4 +72,5 @@ class PendingPairRepositoryTest {
         assertEquals(pendingPair.getId(), found2.get().getId());
     }
 }
+
 

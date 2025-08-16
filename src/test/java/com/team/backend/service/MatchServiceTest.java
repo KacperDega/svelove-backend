@@ -1,12 +1,9 @@
 package com.team.backend.service;
 
+import com.team.backend.model.*;
 import com.team.backend.model.Enum.LikedStatus;
 import com.team.backend.model.Enum.Preference;
 import com.team.backend.model.Enum.Sex;
-import com.team.backend.model.Hobby;
-import com.team.backend.model.Match;
-import com.team.backend.model.PendingPair;
-import com.team.backend.model.User;
 import com.team.backend.repository.MatchRepository;
 import com.team.backend.repository.PendingPairRepository;
 import com.team.backend.repository.UserRepository;
@@ -49,16 +46,20 @@ class MatchServiceTest {
         Hobby hobby = new Hobby();
         hobby.setId(1L);
 
+        City lublin = new City();
+        lublin.setId(1L);
+        lublin.setName("Lublin");
+
         user = User.of("user", "login", "pass", Sex.MALE, Preference.WOMEN,
-                "Description for user", 25, 20, 30, "Lublin", List.of(hobby));
+                "Description for user", 25, 20, 30, lublin, List.of(hobby));
         user.setId(1L);
 
         likingUser = User.of("liker", "likerLogin", "pass", Sex.MALE, Preference.WOMEN,
-                "Description for liker", 28, 22, 35, "Lublin", List.of(hobby));
+                "Description for liker", 28, 22, 35, lublin, List.of(hobby));
         likingUser.setId(1L);
 
         likedUser = User.of("liked", "likedLogin", "pass", Sex.FEMALE, Preference.MEN,
-                "Description for liked", 24, 20, 30, "Lublin", List.of(hobby));
+                "Description for liked", 24, 20, 30, lublin, List.of(hobby));
         likedUser.setId(2L);
 
         pendingPair = new PendingPair();
@@ -66,11 +67,11 @@ class MatchServiceTest {
         user.setHobbies(List.of(hobby));
 
         candidate1 = User.of("c1", "c1login", "pass", Sex.FEMALE, Preference.MEN,
-                "Description for c1", 26, 22, 32, "Lublin", List.of(hobby));
+                "Description for c1", 26, 22, 32, lublin, List.of(hobby));
         candidate1.setId(2L);
 
         candidate2 = User.of("c2", "c2login", "pass", Sex.FEMALE, Preference.MEN,
-                "Description for c2", 27, 21, 33, "Lublin", List.of());
+                "Description for c2", 27, 21, 33, lublin, List.of());
         candidate2.setId(3L);
     }
 
@@ -88,7 +89,7 @@ class MatchServiceTest {
     @Test
     void shouldReturnOnlyCompatiblePotentialMatches() {
         List<User> filteredUsers = List.of(candidate1, candidate2);
-        when(userRepository.findFilteredByAgeAndLocation(user.getId(), user.getAge_min(), user.getAge_max(), user.getLocalization()))
+        when(userRepository.findFilteredByAgeAndLocation(user.getId(), user.getAge_min(), user.getAge_max(), user.getCity().getId()))
                 .thenReturn(filteredUsers);
 
         when(matchRepository.findAllMatchesForUser(user)).thenReturn(List.of());

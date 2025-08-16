@@ -55,9 +55,11 @@ public class User implements UserDetails {
 
     @NonNull
     private Integer age_max;
-    @NonNull
-    private String localization;
 
+    @NonNull
+    @ManyToOne
+    @JoinColumn(name = "city_id")
+    private City city;
 
     @NonNull
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)

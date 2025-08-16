@@ -10,7 +10,7 @@ public record UserMatchDto(
         String username,
         Sex sex,
         int age,
-        String localization,
+        String city,
         Preference preference,
         List<String> hobbies,
         String description,
