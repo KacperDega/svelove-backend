@@ -15,6 +15,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -25,6 +27,7 @@ public class ChatService {
     private final MessageRepository messageRepository;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final UserStatsService userStatsService;
 
     public MessageResponseDto processIncomingMessage(Long matchId, MessageRequestDto requestDto) {
         User sender;
@@ -45,7 +48,24 @@ public class ChatService {
         log.debug(message.toString());
         Message saved = messageRepository.save(message);
 
+        checkAndMarkConversationStarted(match);
+
         return MessageMapper.mapToMessageResponse(saved);
+    }
+
+    private void checkAndMarkConversationStarted(Match match) {
+        if (match.isConversationStarted()) return;
+
+        Set<Long> distinctSenders = match.getMessages().stream()
+                .map(Message::getWrittenBy)
+                .collect(Collectors.toSet());
+
+        if (distinctSenders.size() == 2) {
+            match.setConversationStarted(true);
+            matchRepository.save(match);
+
+            userStatsService.recordConversationStarted(match.getFirstUser(), match.getSecondUser());
+        }
     }
 
     public List<MessageResponseDto> getChatMessagesForMatch(Long matchId) {
