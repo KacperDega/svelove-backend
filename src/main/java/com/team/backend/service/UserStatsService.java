@@ -15,6 +15,44 @@ public class UserStatsService {
 
     private final UserStatsMonthlyRepository statsRepository;
 
+    public List<YearMonth> getAvailableYearMonthsForStats(User user) {
+        return statsRepository.findAllByUser(user).stream()
+                .map(s -> YearMonth.of(s.getYear(), s.getMonth()))
+                .sorted()
+                .toList();
+    }
+
+    public UserStatsMonthly getStatsForMonth(User user, int year, int month) {
+        return statsRepository.findByUserAndYearAndMonth(user, year, month)
+                .orElseThrow(() -> new RuntimeException("No available stats for given period: " + month + "/" + year));
+    }
+
+    private UserStatsMonthly aggregateStats(User user, int year, int month, List<UserStatsMonthly> stats) {
+        UserStatsMonthly aggregated = new UserStatsMonthly();
+        aggregated.setUser(user);
+        aggregated.setYear(year);
+        aggregated.setMonth(month);
+
+        stats.forEach(s -> {
+            aggregated.setLeftSwipes(aggregated.getLeftSwipes() + s.getLeftSwipes());
+            aggregated.setRightSwipes(aggregated.getRightSwipes() + s.getRightSwipes());
+            aggregated.setMatches(aggregated.getMatches() + s.getMatches());
+            aggregated.setMatchesWithConversation(aggregated.getMatchesWithConversation() + s.getMatchesWithConversation());
+        });
+
+        return aggregated;
+    }
+
+    public UserStatsMonthly getStatsForYear(User user, int year) {
+        List<UserStatsMonthly> stats = statsRepository.findAllByUserAndYear(user, year);
+        return aggregateStats(user, year, 0, stats);
+    }
+
+    public UserStatsMonthly getLifetimeStats(User user) {
+        List<UserStatsMonthly> stats = statsRepository.findAllByUser(user);
+        return aggregateStats(user, 0, 0, stats);
+    }
+
     private UserStatsMonthly getOrCreateCurrentMonthStats(User user) {
         YearMonth currentMonth = YearMonth.now();
         return statsRepository.findByUserAndYearAndMonth(
