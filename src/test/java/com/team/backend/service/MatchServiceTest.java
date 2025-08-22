@@ -32,6 +32,7 @@ class MatchServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private PendingPairRepository pendingPairRepository;
     @Mock private PendingPairService pendingPairService;
+    @Mock private UserStatsService userStatsService;
 
     @InjectMocks private MatchService matchService;
 
@@ -81,9 +82,7 @@ class MatchServiceTest {
     void handleLike_shouldThrow_whenLikingUserNotFound() {
         when(userRepository.findByLogin("unknownLogin")).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> {
-            matchService.handleLike("unknownLogin", 2L);
-        });
+        assertThrows(RuntimeException.class, () -> matchService.handleLike("unknownLogin", 2L));
     }
 
     @Test
@@ -116,6 +115,7 @@ class MatchServiceTest {
 
         assertTrue(result);
         verify(pendingPairService).updatePairStatus(pendingPair, likingUser, LikedStatus.LIKED);
+        verify(userStatsService).recordRightSwipe(likingUser);
         verify(matchRepository).save(any(Match.class));
         verify(pendingPairService).deletePendingPair(pendingPair);
     }
@@ -132,6 +132,7 @@ class MatchServiceTest {
 
         assertFalse(result);
         verify(pendingPairService).updatePairStatus(pendingPair, likingUser, LikedStatus.LIKED);
+        verify(userStatsService).recordRightSwipe(likingUser);
         verify(matchRepository, never()).save(any());
         verify(pendingPairService, never()).deletePendingPair(any());
     }
