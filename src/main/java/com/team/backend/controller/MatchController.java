@@ -1,10 +1,8 @@
 package com.team.backend.controller;
 
-import com.team.backend.model.Match;
 import com.team.backend.model.User;
 import com.team.backend.model.dto.MatchDto;
 import com.team.backend.model.dto.UserMatchDto;
-import com.team.backend.model.mapper.MatchMapper;
 import com.team.backend.model.mapper.UserMapper;
 import com.team.backend.service.MatchService;
 import com.team.backend.service.UserService;
@@ -50,6 +48,16 @@ public class MatchController {
             return ResponseEntity.ok("Like registered");
         }
     }
+
+    @PostMapping("/swipe-left/{swipedUserId}")
+    public ResponseEntity<?> swipeLeft(@PathVariable Long swipedUserId, Authentication authentication) {
+        String login = authentication.getName();
+
+        matchService.handleSwipeLeft(login, swipedUserId);
+
+        return ResponseEntity.ok("Swipe left registered");
+    }
+
 
     @GetMapping("/all")
     public ResponseEntity<List<MatchDto>> getUserMatches(Authentication authentication) {

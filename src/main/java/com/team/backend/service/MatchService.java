@@ -32,6 +32,7 @@ public class MatchService {
     private final UserRepository userRepository;
     private final PendingPairRepository pendingPairRepository;
     private final PendingPairService pendingPairService;
+    private final UserStatsService userStatsService;
 
     @Transactional
     public Match save(Match match) {
@@ -98,6 +99,16 @@ public class MatchService {
         return filteredUsers.subList(0, 30);
     }
 
+    public void handleSwipeLeft(String login, Long swipedUserId) {
+        User swipingUser = userRepository.findByLogin(login)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        User swipedUser = userRepository.findById(swipedUserId)
+                .orElseThrow(() -> new RuntimeException("Swiped user not found"));
+
+        userStatsService.recordLeftSwipe(swipingUser);
+    }
+
     public boolean handleLike(String login, Long likedUserId) {
         User likingUser = userRepository.findByLogin(login)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -109,10 +120,16 @@ public class MatchService {
 
         pendingPairService.updatePairStatus(pendingPair, likingUser, LikedStatus.LIKED);
 
+        userStatsService.recordRightSwipe(likingUser);
+
         if (pendingPairService.bothUsersLiked(pendingPair))
         {
             matchRepository.save(new Match(likingUser, likedUser));
             pendingPairService.deletePendingPair(pendingPair);
+
+            userStatsService.recordMatch(likingUser);
+            userStatsService.recordMatch(likedUser);
+
             return true;
         }
 
