@@ -1,5 +1,6 @@
 package com.team.backend.service;
 
+import com.team.backend.model.Enum.NotificationType;
 import com.team.backend.model.Match;
 import com.team.backend.model.Message;
 import com.team.backend.model.User;
@@ -28,6 +29,7 @@ public class ChatService {
     private final UserService userService;
     private final UserRepository userRepository;
     private final UserStatsService userStatsService;
+    private final NotificationService notificationService;
 
     public MessageResponseDto processIncomingMessage(Long matchId, MessageRequestDto requestDto) {
         User sender;
@@ -48,13 +50,16 @@ public class ChatService {
         log.debug(message.toString());
         Message saved = messageRepository.save(message);
 
-        checkAndMarkConversationStarted(match);
+        boolean conversationStartedNow = checkAndMarkConversationStarted(match);
+        if (conversationStartedNow) {
+            sendConversationStartedNotification(match, sender);
+        }
 
         return MessageMapper.mapToMessageResponse(saved);
     }
 
-    private void checkAndMarkConversationStarted(Match match) {
-        if (match.isConversationStarted()) return;
+    private boolean checkAndMarkConversationStarted(Match match) {
+        if (match.isConversationStarted()) return false;
 
         Set<Long> distinctSenders = match.getMessages().stream()
                 .map(Message::getWrittenBy)
@@ -65,7 +70,22 @@ public class ChatService {
             matchRepository.save(match);
 
             userStatsService.recordConversationStarted(match.getFirstUser(), match.getSecondUser());
+            return true;
         }
+        return false;
+    }
+
+    private void sendConversationStartedNotification(Match match, User sender) {
+        User recipient = match.getFirstUser().getId().equals(sender.getId())
+                ? match.getSecondUser()
+                : match.getFirstUser();
+
+        notificationService.createNotification(
+                recipient,
+                NotificationType.NEW_CONVERSATION,
+                "Masz nową rozmowę z " + sender.getUsername(),
+                match.getId()
+        );
     }
 
     public List<MessageResponseDto> getChatMessagesForMatch(Long matchId) {
