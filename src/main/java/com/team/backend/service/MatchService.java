@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 import com.team.backend.model.Enum.Preference;
 
+import static com.team.backend.model.Enum.NotificationType.NEW_MATCH;
+
 @Service
 @RequiredArgsConstructor
 public class MatchService {
@@ -33,6 +35,7 @@ public class MatchService {
     private final PendingPairRepository pendingPairRepository;
     private final PendingPairService pendingPairService;
     private final UserStatsService userStatsService;
+    private final NotificationService notificationService;
 
     @Transactional
     public Match save(Match match) {
@@ -124,8 +127,12 @@ public class MatchService {
 
         if (pendingPairService.bothUsersLiked(pendingPair))
         {
-            matchRepository.save(new Match(likingUser, likedUser));
+            Match newMatch = new Match(likingUser, likedUser);
+            matchRepository.save(newMatch);
             pendingPairService.deletePendingPair(pendingPair);
+
+            notificationService.createNotification(likingUser, NEW_MATCH, "Nowy match z: " + likedUser.getUsername(), newMatch.getId());
+            notificationService.createNotification(likedUser, NEW_MATCH, "Nowy match z: " + likingUser.getUsername(), newMatch.getId());
 
             userStatsService.recordMatch(likingUser);
             userStatsService.recordMatch(likedUser);

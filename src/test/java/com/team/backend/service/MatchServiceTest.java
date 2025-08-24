@@ -33,6 +33,7 @@ class MatchServiceTest {
     @Mock private PendingPairRepository pendingPairRepository;
     @Mock private PendingPairService pendingPairService;
     @Mock private UserStatsService userStatsService;
+    @Mock private NotificationService notificationService;
 
     @InjectMocks private MatchService matchService;
 
