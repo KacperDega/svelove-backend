@@ -16,7 +16,7 @@ public class HobbyController {
     private final HobbyService hobbyService;
 
     @GetMapping
-    public ResponseEntity<List<Hobby>> getAllHobbies() {
-        return ResponseEntity.ok(hobbyService.getAllHobbies());
+    public ResponseEntity<List<Hobby>> getHobbies() {
+        return ResponseEntity.ok(hobbyService.getAllHobbiesSorted());
     }
 }

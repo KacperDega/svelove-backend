@@ -15,8 +15,8 @@ public class CityService {
 
     private final CityRepository cityRepository;
 
-    public List<CityDto> getAllCities() {
-        List<City> cities = cityRepository.findAll();
+    public List<CityDto> getAllCitiesSorted() {
+        List<City> cities = cityRepository.findAllByOrderByNameAsc();
         return CityMapper.mapToCityDtoList(cities);
     }
 
