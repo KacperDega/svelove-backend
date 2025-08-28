@@ -25,9 +25,9 @@ public class UserMapper {
 
         City city = cityService.getCityByIdOrThrow(userRequest.cityId());
 
-        List<Hobby> hobbies = userRequest.hobbies().stream()
-                .map(hobbyName -> hobbyRepository.findByName(hobbyName)
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid hobby: " + hobbyName)))
+        List<Hobby> hobbies = userRequest.hobbyIds().stream()
+                .map(hobbyId -> hobbyRepository.findById(hobbyId)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid hobby with Id: " + hobbyId)))
                 .toList();
         log.debug(hobbies.toString());
 

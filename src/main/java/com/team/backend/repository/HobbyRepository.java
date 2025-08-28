@@ -11,5 +11,7 @@ import java.util.Optional;
 public interface HobbyRepository extends JpaRepository<Hobby, Long> {
     Optional<Hobby> findByName(String name);
 
+    Optional<Hobby> findById(Long id);
+
     List<Hobby> findAllByOrderByNameAsc();
 }

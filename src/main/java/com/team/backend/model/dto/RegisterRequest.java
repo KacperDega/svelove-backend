@@ -52,7 +52,7 @@ public record RegisterRequest(
 
         @NotNull(message = "{hobby_list.not.null}")
         @NotEmpty(message = "{hobby_list.not.empty}")
-        List<String> hobbies
+        List<Long> hobbyIds
 
 ) {
 }

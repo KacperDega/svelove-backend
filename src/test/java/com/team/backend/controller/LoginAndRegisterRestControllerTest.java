@@ -60,7 +60,7 @@ class LoginAndRegisterRestControllerTest {
         // Given
         RegisterRequest registerRequest =
                 new RegisterRequest("testUser", "testLogin", "password123", Sex.MALE, Preference.BOTH, "I am a test user", 25,
-                20, 30, 1L, List.of("reading") );
+                20, 30, 1L, List.of(1L) );
         RegisterResponseDto expectedResponse = new RegisterResponseDto("testUser", "testLogin", "REGISTERED");
 
         MockMultipartFile jsonPart = new MockMultipartFile(
