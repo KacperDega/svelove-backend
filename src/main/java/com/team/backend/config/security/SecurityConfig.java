@@ -56,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/profile/**").permitAll()
                         .requestMatchers("/discover/**").permitAll()
+                        .requestMatchers("/cities/**", "/hobbies").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**","/swagger-ui.html").permitAll()
                         // wszystkie endpointy
                         //.requestMatchers(HttpMethod.GET, "/patient/{accessId}").permitAll()
