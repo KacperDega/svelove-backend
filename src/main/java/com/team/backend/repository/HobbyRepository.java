@@ -13,5 +13,5 @@ public interface HobbyRepository extends JpaRepository<Hobby, Long> {
 
     Optional<Hobby> findById(Long id);
 
-    List<Hobby> findAllByOrderByNameAsc();
+    List<Hobby> findAllByOrderByLabelAsc();
 }

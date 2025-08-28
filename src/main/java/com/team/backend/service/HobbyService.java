@@ -15,7 +15,7 @@ public class HobbyService {
     private final HobbyRepository hobbyRepository;
 
     public List<Hobby> getAllHobbiesSorted() {
-        return hobbyRepository.findAllByOrderByNameAsc();
+        return hobbyRepository.findAllByOrderByLabelAsc();
     }
 
     public List<Hobby> getHobbiesByIdList(List<Long> idList) {
