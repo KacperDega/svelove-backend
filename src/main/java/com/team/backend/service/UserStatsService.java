@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class UserStatsService {
         return statsRepository.findAllByUser(user).stream()
                 .map(s -> YearMonth.of(s.getYear(), s.getMonth()))
                 .sorted()
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public UserStatsMonthly getStatsForMonth(User user, int year, int month) {

@@ -100,6 +100,6 @@ public class ChatService {
 
         return messageRepository.findByMatchIdOrderByTimestampDesc(matchId).stream()
                 .map(MessageMapper::mapToMessageResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 }
