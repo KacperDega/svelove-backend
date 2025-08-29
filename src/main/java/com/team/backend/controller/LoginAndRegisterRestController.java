@@ -1,7 +1,6 @@
 package com.team.backend.controller;
 
 
-import com.team.backend.model.dto.ErrorResponse;
 import com.team.backend.model.dto.LoginResponseDto;
 import com.team.backend.model.dto.RegisterRequest;
 import com.team.backend.model.dto.RegisterResponseDto;
@@ -17,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @Log4j2
 @AllArgsConstructor
@@ -28,19 +29,20 @@ public class LoginAndRegisterRestController
     private final UserMapper userMapper;
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> registerUser(
+    public ResponseEntity<?> register(
             @RequestPart("data") @Valid RegisterRequest registerRequest,
-            @RequestPart("photos") MultipartFile[] photos) {
+            @RequestPart(value = "photos") List<MultipartFile> photos
+    ) {
 
         log.info("Register request: {}", registerRequest);
 
-        if (photos == null || photos.length == 0) {
+        if (photos == null || photos.isEmpty()) {
             return ResponseEntity
                     .badRequest()
                     .body("At least one photo must be uploaded.");
         }
 
-        if (photos.length > 5) {
+        if (photos.size() > 5) {
             return ResponseEntity
                     .badRequest()
                     .body("Max 5 photos per user allowed.");
