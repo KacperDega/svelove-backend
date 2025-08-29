@@ -29,12 +29,13 @@ public class LoginAndRegisterService {
 
 
     @Transactional
-    public RegisterResponseDto register(RegisterRequest requestDto, MultipartFile[] photos) throws IOException {
+    public RegisterResponseDto register(RegisterRequest requestDto, List<MultipartFile> photos) throws IOException {
         final User user = userMapper.mapToUser(requestDto);
         String encodedPassword = encoderService.encodePassword(user.getPassword());
         user.setPassword(encodedPassword);
 
         final User savedUser = userRepository.save(user);
+        savedUser.setPhotoUrls(new ArrayList<>());
         log.info("User registered: {}", savedUser);
 
         List<String> uploadedUrls = new ArrayList<>();
@@ -43,12 +44,22 @@ public class LoginAndRegisterService {
                 String url = supabaseStorageService.uploadImage(photo, savedUser.getId());
                 uploadedUrls.add(url);
             }
+//            log.info("Uploaded URLs list: {}", uploadedUrls);
 
-            savedUser.setPhotoUrls(uploadedUrls);
+            savedUser.getPhotoUrls().clear();
+            savedUser.getPhotoUrls().addAll(uploadedUrls);
             userRepository.save(savedUser);
+
         } catch (Exception ex) {
-            log.warn("Photo upload failed, throwing to trigger rollback", ex);
-            throw new RuntimeException("Photo upload failed. Rollback registration.");
+            for (String url : uploadedUrls) {
+                try {
+                    supabaseStorageService.deleteImage(url);
+                } catch (Exception deleteEx) {
+                    log.warn("Failed to delete uploaded image during rollback: {}", url, deleteEx);
+                }
+            }
+
+            throw new RuntimeException("Photo upload failed. Rollback registration.", ex);
         }
 
         return userMapper.mapToRegisterResponse(savedUser);

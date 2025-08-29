@@ -12,6 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class UserMapper {
         List<Hobby> hobbies = userRequest.hobbyIds().stream()
                 .map(hobbyId -> hobbyRepository.findById(hobbyId)
                         .orElseThrow(() -> new IllegalArgumentException("Invalid hobby with Id: " + hobbyId)))
-                .toList();
+                .collect(Collectors.toList());
         log.debug(hobbies.toString());
 
         return User.of(
