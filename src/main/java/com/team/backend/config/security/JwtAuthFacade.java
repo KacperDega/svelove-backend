@@ -51,7 +51,7 @@ public class JwtAuthFacade {
         ZonedDateTime localTime = LocalDateTime.now().atZone(ZoneId.of("Europe/Warsaw"));
         Instant now = localTime.toInstant();
         Instant expireAt = now.plus(Duration.ofHours(12));
-        String issuer = "TeamProject Backend";
+        String issuer = "Svelove";
 
         return JWT.create()
                 .withSubject(user.getUsername())
