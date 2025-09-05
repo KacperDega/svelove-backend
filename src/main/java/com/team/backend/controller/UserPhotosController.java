@@ -5,6 +5,7 @@ import com.team.backend.service.PhotoService;
 import com.team.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -48,9 +49,9 @@ public class UserPhotosController {
         }
     }
 
-    @PutMapping("/profile/photos")
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updatePhotos(
-            @RequestPart("orderedPhotoUrls") List<String> orderedPhotoUrls,
+            @RequestParam("orderedPhotoUrls") List<String> orderedPhotoUrls,
             @RequestPart(value = "newPhotos", required = false) List<MultipartFile> newPhotos,
             Authentication auth
     ) {
@@ -66,7 +67,6 @@ public class UserPhotosController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Upload failed");
         }
     }
-
 
 }
 

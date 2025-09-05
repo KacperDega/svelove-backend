@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -74,6 +75,10 @@ public class PhotoService {
         if (orderedPhotoUrls.size() > 5) {
             throw new IllegalArgumentException("Maximum of 5 photos allowed");
         }
+
+        orderedPhotoUrls = orderedPhotoUrls.stream()
+                .map(s -> s != null && s.isEmpty() ? null : s)
+                .collect(Collectors.toList());
 
         for (String url : orderedPhotoUrls) {
             if (url != null && !user.getPhotoUrls().contains(url)) {
