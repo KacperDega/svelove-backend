@@ -5,11 +5,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,9 +57,7 @@ class PhotoServiceTest {
 
         MultipartFile file = mock(MultipartFile.class);
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            photoService.uploadUserPhoto(user, file);
-        });
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> photoService.uploadUserPhoto(user, file));
 
         assertEquals("Max 5 photos per user allowed.", exception.getMessage());
     }
@@ -83,9 +83,7 @@ class PhotoServiceTest {
         User user = new User();
         user.setPhotoUrls(new ArrayList<>(Arrays.asList("a", "b", "c")));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            photoService.deleteUserPhoto(user, "x");
-        });
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> photoService.deleteUserPhoto(user, "x"));
 
         assertEquals("Photo URL not found", exception.getMessage());
     }
@@ -95,17 +93,41 @@ class PhotoServiceTest {
     // ========================================
 
     @Test
-    void shouldUpdatePhotoOrderCorrectly() {
+    void shouldUpdatePhotosCorrectlyWithExistingUrls() throws IOException {
         User user = new User();
         user.setPhotoUrls(Arrays.asList("1", "2", "3", null, null));
 
         List<String> newOrder = Arrays.asList("3", "1", null);
+        List<MultipartFile> newFiles = Collections.emptyList();
 
-        photoService.updatePhotoOrder(user, newOrder);
+        List<String> result = photoService.updatePhotos(user, newOrder, newFiles);
 
         List<String> expected = Arrays.asList("3", "1", null, null, null);
-        assertEquals(expected, user.getPhotoUrls());
+        assertEquals(expected, result);
         verify(userService).saveUser(user);
+    }
+
+    @Test
+    void shouldUploadNewFilesAndUpdateOrder() throws IOException {
+        User user = new User();
+        user.setPhotoUrls(Arrays.asList("1", "2", null, null, null));
+
+        MockMultipartFile file1 = new MockMultipartFile("file1", "file1.jpg", "image/jpeg", new byte[]{1});
+        MockMultipartFile file2 = new MockMultipartFile("file2", "file2.jpg", "image/jpeg", new byte[]{2});
+
+        when(storageService.uploadImage(file1, user.getId())).thenReturn("new1");
+        when(storageService.uploadImage(file2, user.getId())).thenReturn("new2");
+
+        List<String> newOrder = Arrays.asList("1", null, "2", null, null);
+        List<MultipartFile> newFiles = Arrays.asList(file1, file2);
+
+        List<String> result = photoService.updatePhotos(user, newOrder, newFiles);
+
+        List<String> expected = Arrays.asList("1", "new1", "2", "new2", null);
+        assertEquals(expected, result);
+        verify(userService).saveUser(user);
+        verify(storageService).uploadImage(file1, user.getId());
+        verify(storageService).uploadImage(file2, user.getId());
     }
 
     @Test
@@ -115,11 +137,9 @@ class PhotoServiceTest {
 
         List<String> newOrder = Arrays.asList("2", "2", null);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            photoService.updatePhotoOrder(user, newOrder);
-        });
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> photoService.updatePhotos(user, newOrder, Collections.emptyList()));
 
-        assertEquals("Duplicate photo URLs are not allowed", exception.getMessage());
+        assertEquals("Duplicate photo URLs are not allowed", ex.getMessage());
     }
 
     @Test
@@ -129,11 +149,9 @@ class PhotoServiceTest {
 
         List<String> newOrder = Arrays.asList("1", "x", null);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            photoService.updatePhotoOrder(user, newOrder);
-        });
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> photoService.updatePhotos(user, newOrder, Collections.emptyList()));
 
-        assertEquals("Invalid photo URL in order list", exception.getMessage());
+        assertEquals("Invalid photo URL in order list", ex.getMessage());
     }
 
     @Test
@@ -141,11 +159,9 @@ class PhotoServiceTest {
         User user = new User();
         user.setPhotoUrls(Arrays.asList("1", "2", null, null, null));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            photoService.updatePhotoOrder(user, new ArrayList<>());
-        });
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> photoService.updatePhotos(user, new ArrayList<>(), Collections.emptyList()));
 
-        assertEquals("At least one photo must be provided", exception.getMessage());
+        assertEquals("At least one photo must be provided", ex.getMessage());
     }
 
 }

@@ -66,35 +66,73 @@ public class PhotoService {
     }
 
 
-    public void updatePhotoOrder(User user, List<String> newOrder) {
-        if (newOrder == null || newOrder.isEmpty() || newOrder.stream().noneMatch(Objects::nonNull)) {
+    public List<String> updatePhotos(User user, List<String> orderedPhotoUrls, List<MultipartFile> newPhotos) throws IOException {
+        if (orderedPhotoUrls == null || orderedPhotoUrls.isEmpty() || orderedPhotoUrls.stream().noneMatch(Objects::nonNull)) {
             throw new IllegalArgumentException("At least one photo must be provided");
         }
 
-        if (newOrder.size() > 5) {
+        if (orderedPhotoUrls.size() > 5) {
             throw new IllegalArgumentException("Maximum of 5 photos allowed");
         }
 
-        for (String url : newOrder) {
+        for (String url : orderedPhotoUrls) {
             if (url != null && !user.getPhotoUrls().contains(url)) {
                 throw new IllegalArgumentException("Invalid photo URL in order list");
             }
         }
 
-        long nonNullCount = newOrder.stream().filter(Objects::nonNull).count();
-        long distinctNonNullCount = newOrder.stream().filter(Objects::nonNull).distinct().count();
-
+        long nonNullCount = orderedPhotoUrls.stream().filter(Objects::nonNull).count();
+        long distinctNonNullCount = orderedPhotoUrls.stream().filter(Objects::nonNull).distinct().count();
         if (nonNullCount != distinctNonNullCount) {
             throw new IllegalArgumentException("Duplicate photo URLs are not allowed");
         }
 
-        List<String> finalOrder = new ArrayList<>(newOrder);
+        List<String> finalOrder = new ArrayList<>();
+        List<String> uploadedUrls = new ArrayList<>();
+        int uploadIndex = 0;
+
+        try {
+            for (String url : orderedPhotoUrls) {
+                if (url == null) {
+                    if (newPhotos != null && uploadIndex < newPhotos.size()) {
+                        String newUrl = storageService.uploadImage(newPhotos.get(uploadIndex++), user.getId());
+                        uploadedUrls.add(newUrl); // rollback
+                        finalOrder.add(newUrl);
+                    } else {
+                        finalOrder.add(null);
+                    }
+                } else {
+                    finalOrder.add(url);
+                }
+            }
+        } catch (Exception ex) {
+            // upload rollback
+            for (String u : uploadedUrls) {
+                try {
+                    storageService.deleteImage(u);
+                } catch (Exception ignore) {}
+            }
+            throw new IOException("Photo upload failed: " + ex.getMessage(), ex);
+        }
+
+        for (String existingUrl : user.getPhotoUrls()) {
+            if (existingUrl != null && !finalOrder.contains(existingUrl)) {
+                try {
+                    storageService.deleteImage(existingUrl);
+                } catch (Exception ex) {
+                    System.err.println("Nie udało się usunąć starego zdjęcia: " + existingUrl);
+                }
+            }
+        }
+
         while (finalOrder.size() < 5) {
             finalOrder.add(null);
         }
 
         user.setPhotoUrls(finalOrder);
         userService.saveUser(user);
+
+        return finalOrder;
     }
 
 }

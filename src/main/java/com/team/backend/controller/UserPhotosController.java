@@ -1,17 +1,17 @@
 package com.team.backend.controller;
 
 import com.team.backend.model.User;
-import com.team.backend.model.dto.PhotoUpdateRequest;
 import com.team.backend.service.PhotoService;
 import com.team.backend.service.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/profile/photos")
@@ -48,19 +48,25 @@ public class UserPhotosController {
         }
     }
 
-    @PutMapping("/order")
-    public ResponseEntity<?> updatePhotoOrder(@RequestBody @Valid PhotoUpdateRequest request,
-                                              Authentication auth) {
+    @PutMapping("/profile/photos")
+    public ResponseEntity<?> updatePhotos(
+            @RequestPart("orderedPhotoUrls") List<String> orderedPhotoUrls,
+            @RequestPart(value = "newPhotos", required = false) List<MultipartFile> newPhotos,
+            Authentication auth
+    ) {
         String login = auth.getName();
         User user = userService.getUserByLogin(login);
 
         try {
-            photoService.updatePhotoOrder(user, request.orderedPhotoUrls());
-            return ResponseEntity.ok("Photo order updated");
-        } catch (IllegalArgumentException ex) {
+            List<String> finalUrls = photoService.updatePhotos(user, orderedPhotoUrls, newPhotos);
+            return ResponseEntity.ok(finalUrls);
+        } catch (IllegalArgumentException | IllegalStateException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Upload failed");
         }
     }
+
 
 }
 
