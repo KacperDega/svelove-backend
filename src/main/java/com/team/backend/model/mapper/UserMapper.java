@@ -65,7 +65,7 @@ public class UserMapper {
                 user.getCity().getName(),
                 user.getPreference(),
                 user.getHobbies().stream()
-                        .map(Hobby::getName)
+                        .map(Hobby::getLabel)
                         .collect(Collectors.toList()),
                 user.getDescription(),
                 user.getPhotoUrls()
@@ -80,7 +80,7 @@ public class UserMapper {
                 user.getSex().getDisplayName(),
                 user.getPreference().getDisplayName(),
                 user.getHobbies().stream()
-                        .map(Hobby::getName)
+                        .map(Hobby::getLabel)
                         .collect(Collectors.toList()),
                 user.getDescription(),
                 user.getCity().getName(),
