@@ -27,6 +27,7 @@ public class NotificationService {
                 .build();
 
         notificationRepository.save(n);
+        notificationRepository.flush();
 
         notificationRepository.deleteAllExceptLatestNByUser(user.getId(), MAX_NOTIFICATIONS_PER_USER);
     }
