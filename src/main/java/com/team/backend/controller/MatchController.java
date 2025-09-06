@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.team.backend.model.mapper.MatchMapper.mapToMatchDto;
 
@@ -37,17 +39,20 @@ public class MatchController {
     }
 
     @PostMapping("/like/{likedUserId}")
-    public ResponseEntity<?> likeUser(@PathVariable Long likedUserId, Authentication authentication) {
+    public ResponseEntity<Map<String, String>> likeUser(
+            @PathVariable Long likedUserId,
+            Authentication authentication
+    ) {
         String login = authentication.getName();
 
         boolean matchCreated = matchService.handleLike(login, likedUserId);
 
-        if (matchCreated) {
-            return ResponseEntity.ok("Match created");
-        } else {
-            return ResponseEntity.ok("Like registered");
-        }
+        Map<String, String> response = new HashMap<>();
+        response.put("status", matchCreated ? "match" : "like");
+
+        return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/swipe-left/{swipedUserId}")
     public ResponseEntity<?> swipeLeft(@PathVariable Long swipedUserId, Authentication authentication) {
