@@ -4,8 +4,10 @@ import com.team.backend.model.Enum.NotificationType;
 import com.team.backend.model.Match;
 import com.team.backend.model.Message;
 import com.team.backend.model.User;
+import com.team.backend.model.dto.ConversationDto;
 import com.team.backend.model.dto.MessageRequestDto;
 import com.team.backend.model.dto.MessageResponseDto;
+import com.team.backend.model.mapper.ConversationMapper;
 import com.team.backend.model.mapper.MessageMapper;
 import com.team.backend.repository.MatchRepository;
 import com.team.backend.repository.MessageRepository;
@@ -15,6 +17,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -100,6 +103,19 @@ public class ChatService {
 
         return messageRepository.findByMatchIdOrderByTimestampDesc(matchId).stream()
                 .map(MessageMapper::mapToMessageResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<ConversationDto> getUserConversationsWithLastMessage(User user) {
+        List<Match> matches = matchRepository.findAllMatchesForUser(user);
+
+        return matches.stream()
+                .map(match -> {
+                    Message lastMessage = messageRepository.findFirstByMatchIdOrderByTimestampDesc(match.getId()).orElse(null);
+
+                    return ConversationMapper.toConversationDto(match, user, lastMessage);
+                })
+                .sorted(Comparator.comparing(ConversationDto::lastMessageTimestamp, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
     }
 }
