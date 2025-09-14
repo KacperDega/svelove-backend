@@ -34,20 +34,8 @@ public class ChatService {
     private final UserStatsService userStatsService;
     private final NotificationService notificationService;
 
-    public MessageResponseDto processIncomingMessage(Long matchId, MessageRequestDto requestDto) {
-        User sender;
-        try {
-            // Try to get current user from security context
-            sender = userService.getCurrentUser();
-        } catch (Exception e) {
-            // If security context fails, fall back to writer ID from message
-            log.warn("Failed to get user from security context, falling back to message writtenBy: {}", requestDto.writtenBy());
-            sender = userRepository.findById(requestDto.writtenBy())
-                    .orElseThrow(() -> new RuntimeException("User not found with ID: " + requestDto.writtenBy()));
-        }
-
+    public MessageResponseDto processIncomingMessage(Long matchId, MessageRequestDto requestDto, User sender) {
         Match match = matchRepository.findById(matchId).orElseThrow(() -> new RuntimeException("Match not found: " + matchId));
-
 
         Message message = MessageMapper.toEntity(requestDto, sender, match);
         log.debug(message.toString());
@@ -115,7 +103,10 @@ public class ChatService {
 
                     return ConversationMapper.toConversationDto(match, user, lastMessage);
                 })
-                .sorted(Comparator.comparing(ConversationDto::lastMessageTimestamp, Comparator.reverseOrder()))
+                .sorted(Comparator.comparing(
+                        ConversationDto::lastMessageTimestamp,
+                        Comparator.nullsFirst(Comparator.reverseOrder())
+                ))
                 .collect(Collectors.toList());
     }
 }

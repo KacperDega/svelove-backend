@@ -29,23 +29,18 @@ public class ChatController {
     private final UserService userService;
     private final ChatService chatService;
 
-    @MessageMapping("/{matchId}")
+    @MessageMapping("chat/{matchId}")
     public void processMessage(@DestinationVariable String matchId, MessageRequestDto messageRequestDto, Authentication authentication) {
         log.info("Received message for match {}: {}", matchId, messageRequestDto);
-        if (authentication != null) {
-            log.info("Message sent by authenticated user: {}", authentication.getName());
-        } else {
-            log.warn("Message received without authentication");
-            // Make sure the message contains a valid senderId
-            if (messageRequestDto.writtenBy() == null) {
-                log.error("Message rejected: No sender ID provided");
-                return;
-            }
-        }
+        //log.info("Authentication user: {}", ((User) authentication.getPrincipal()).getLogin());
 
-        MessageResponseDto messageResponseDto = chatService.processIncomingMessage(Long.parseLong(matchId), messageRequestDto);
+        //User currentUser = userService.getCurrentUser();
+        String userLogin = ((User) authentication.getPrincipal()).getLogin();
+        User currentUser = userService.getUserByLogin(userLogin);
+        log.info("Message sent by authenticated user: {} (ID: {})", currentUser.getLogin(), currentUser.getId());
 
-        // Send the message to all subscribers
+        MessageResponseDto messageResponseDto = chatService.processIncomingMessage(Long.parseLong(matchId), messageRequestDto, currentUser);
+
         messagingTemplate.convertAndSend("/topic/messages/" + matchId, messageResponseDto);
 
         log.info("Received and saved message to match {}: {}", matchId, messageResponseDto);
