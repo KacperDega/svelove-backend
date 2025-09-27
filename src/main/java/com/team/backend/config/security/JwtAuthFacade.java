@@ -42,7 +42,7 @@ public class JwtAuthFacade {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
 
-        return new JwtResponseDto(user.getUsername(),user.getId(),token);
+        return new JwtResponseDto(user.getUsername(),user.getId(),token, user.getPhotoUrls().getFirst());
     }
 
     private String createToken(final User user) {
