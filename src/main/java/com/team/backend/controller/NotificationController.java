@@ -38,7 +38,7 @@ public class NotificationController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/mark-all-read")
+    @PostMapping("/read-all")
     public ResponseEntity<Void> markAllAsRead(Authentication auth) {
         User user = userService.getCurrentUser(auth);
         notificationService.markAllAsRead(user);
