@@ -6,6 +6,8 @@ import com.team.backend.repository.UserStatsMonthlyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,13 +35,16 @@ public class UserStatsService {
         aggregated.setUser(user);
         aggregated.setYear(year);
         aggregated.setMonth(month);
+        LocalDateTime latestUpdate = LocalDateTime.of(1970, Month.JANUARY, 1, 0, 0);
 
-        stats.forEach(s -> {
+        for(UserStatsMonthly s : stats) {
+            latestUpdate = latestUpdate.isBefore(s.getUpdatedAt()) ? s.getUpdatedAt() : latestUpdate;
             aggregated.setLeftSwipes(aggregated.getLeftSwipes() + s.getLeftSwipes());
             aggregated.setRightSwipes(aggregated.getRightSwipes() + s.getRightSwipes());
             aggregated.setMatches(aggregated.getMatches() + s.getMatches());
             aggregated.setMatchesWithConversation(aggregated.getMatchesWithConversation() + s.getMatchesWithConversation());
-        });
+        };
+        aggregated.setUpdatedAt(latestUpdate);
 
         return aggregated;
     }
