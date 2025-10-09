@@ -131,8 +131,8 @@ public class MatchService {
             matchRepository.save(newMatch);
             pendingPairService.deletePendingPair(pendingPair);
 
-            notificationService.createNotification(likingUser, NEW_MATCH, "Nowy match z: " + likedUser.getUsername(), newMatch.getId());
-            notificationService.createNotification(likedUser, NEW_MATCH, "Nowy match z: " + likingUser.getUsername(), newMatch.getId());
+            notificationService.createNotification(likingUser, NEW_MATCH, "Masz nowy match z " + likedUser.getUsername(), newMatch.getId());
+            notificationService.createNotification(likedUser, NEW_MATCH, "Masz nowy match z " + likingUser.getUsername(), newMatch.getId());
 
             userStatsService.recordMatch(likingUser);
             userStatsService.recordMatch(likedUser);
