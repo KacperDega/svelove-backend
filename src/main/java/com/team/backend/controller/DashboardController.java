@@ -3,6 +3,7 @@ package com.team.backend.controller;
 import com.team.backend.model.Enum.NotificationType;
 import com.team.backend.model.Notification;
 import com.team.backend.model.User;
+import com.team.backend.model.UserStatsMonthly;
 import com.team.backend.model.dto.DashboardDto;
 import com.team.backend.model.dto.NotificationDto;
 import com.team.backend.model.dto.UserStatsDto;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -56,10 +58,23 @@ public class DashboardController {
                 .toList();
 
         YearMonth currentMonth = YearMonth.now();
-        UserStatsDto currentMonthStats = UserStatsMapper.toUserStatsDto(
-                userStatsService.getStatsForMonth(currentUser, currentMonth.getYear(), currentMonth.getMonthValue())
-        );
-
+        UserStatsDto currentMonthStats;
+        try {
+            UserStatsMonthly stats = userStatsService.getStatsForMonth(currentUser, currentMonth.getYear(), currentMonth.getMonthValue());
+            currentMonthStats = UserStatsMapper.toUserStatsDto(stats);
+        } catch (RuntimeException e) {
+            currentMonthStats = new UserStatsDto(
+                    currentMonth.getYear(),
+                    currentMonth.getMonthValue(),
+                    0L,
+                    0L,
+                    0L,
+                    0L,
+                    0L,
+                    0L,
+                    LocalDateTime.now()
+            );
+        }
 
         DashboardDto dashboardDto = new DashboardDto(username, profilePictureUrl, newMatchesCount, newMessagesCount, notifications, currentMonthStats);
         return ResponseEntity.ok(dashboardDto);
