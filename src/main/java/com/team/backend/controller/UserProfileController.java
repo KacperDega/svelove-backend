@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "*")
 @AllArgsConstructor
 @RequestMapping("/profile")
 public class UserProfileController {
