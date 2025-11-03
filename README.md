@@ -90,8 +90,8 @@ This is the backend for Svelove, a dating application. It is a RESTful API built
 
 ### 📑 API Documentation
 
-> **Note:** The API documentation (Swagger UI) is available here:
-> https://kacperdega.github.io/svelove-backend/
+ **Note:** The API documentation (Swagger UI) is available here:
+ https://kacperdega.github.io/svelove-backend/
 
 ### ✅ Running Tests
 
