@@ -7,7 +7,7 @@
 ## 🚀 Overview
 
 This is the backend for Svelove, a dating application. It is a RESTful API built with Spring Boot that provides services for user authentication, matching, messaging, and more.
-
+This application is specifically designed for the Polish market, utilizing a database of Polish cities for user locations and offering hobbies translated into Polish.
 ## 🛠️ Tech Stack
 
 ### Core
@@ -96,5 +96,5 @@ This is the backend for Svelove, a dating application. It is a RESTful API built
 ### ✅ Running Tests
 
 ```bash
-mvn test
+./mvnw test
 ```
