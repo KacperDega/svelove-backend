@@ -93,6 +93,8 @@ This application is specifically designed for the Polish market, utilizing a dat
  **Note:** The API documentation (Swagger UI) is available here:
  https://kacperdega.github.io/svelove-backend/
 
+ If you run the backend locally, the Swagger UI will also be available under the address where the backend is served (by default): http://localhost:8080/swagger-ui.html
+
 ### ✅ Running Tests
 
 ```bash
