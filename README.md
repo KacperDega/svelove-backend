@@ -83,6 +83,8 @@ This application is specifically designed for the Polish market, utilizing a dat
     - After the dependencies are downloaded, find the main application class: `com.team.backend.BackendApplication`.
     - Right-click inside the editor for this class and select the **Run 'BackendApplication.main()'** option.
     - The application will start, and the server logs will appear in the *Run* console in IntelliJ.
+    - **Important:** To make the application use the `.env` file, you need to edit the run configuration. In IntelliJ, go to `Run > Edit Configurations...`, select `BackendApplication`, and in the `Environment variables` field, click the icon on the right and add a path to your `.env` file.
+    - After configuring, you can run the application.
 
 ---
 
